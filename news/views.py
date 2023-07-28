@@ -12,6 +12,10 @@ class CustomSerializer(Serializer):
     def get_dump_object(self, obj):
         return {"id":obj.id, **self._current}
     
+class UserSerializer(Serializer):
+    def get_dump_object(self, obj):
+        return {"id":obj.id, "first_name":obj.first_name,"last_name":obj.last_name,"date_joined":obj.date_joined,"is_author":obj.is_author} 
+    
 # endpoints
 
 #categories
@@ -73,6 +77,23 @@ def update_tag(request):
     tag.save()
     return HttpResponse(status=201)
 
+#users
+
+def registration(request): #изучить про шифрование и доступ
+    body = json.loads(request.body.decode("utf-8"))
+    user = User()
+    user.first_name = body['first_name']
+    user.last_name = body['last_name']
+    user.email = body['email']
+    user.username = body['username']
+    user.password = body['password']
+    user.save()
+    return HttpResponse(status=201)
+
+def users_list(request):
+    data =  UserSerializer().serialize(User.objects.all())
+    return HttpResponse(data, content_type="application/json")
+
 
 # handlers - возможно стоит разнести по модулям
 def category_handle(request):
@@ -90,3 +111,9 @@ def tags_handle(request):
         return create_tag(request)
     elif request.method == 'PUT':
            return update_tag(request)
+
+def user_handle(request):
+    if request.method == 'GET':
+        return users_list(request)
+    elif request.method == 'POST':
+        return registration(request)
