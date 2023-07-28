@@ -15,6 +15,18 @@ GET  http://127.0.0.1:8000/category/  HTTP/1.1
 
 ###
 
+# @name update categories
+
+PUT  http://127.0.0.1:8000/category/  HTTP/1.1
+content-type: application/json
+
+{
+    "category_name": "Football",
+    "id": 2
+}
+
+###
+
 
 # @name add tags
 POST  http://127.0.0.1:8000/tags/  HTTP/1.1
@@ -29,5 +41,17 @@ content-type: application/json
 # @name get tags
 
 GET  http://127.0.0.1:8000/tags/  HTTP/1.1
+
+###
+
+# @name update tag
+
+PUT  http://127.0.0.1:8000/tags/  HTTP/1.1
+content-type: application/json
+
+{
+    "tag_name": "base",
+    "id": 1
+}
 
 ###
