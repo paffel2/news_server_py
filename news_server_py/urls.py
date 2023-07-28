@@ -20,5 +20,6 @@ from news import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('category/',views.category_handle)
+    path('category/',views.category_handle),
+    path('tags/',views.tags_handle)
 ]
