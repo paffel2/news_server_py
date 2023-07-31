@@ -1,9 +1,10 @@
 from django.http import HttpResponse
-from ..models import User
+from ..models import User, Token, Author
 from django.core.serializers.json import Serializer
 import json
 import django.contrib.auth.hashers as hash
 from django.core.exceptions import ObjectDoesNotExist
+import uuid
 
 class UserSerializer(Serializer):
     def get_dump_object(self, obj):
@@ -42,12 +43,27 @@ def user_handle(request):
         return delete_user(request)
     
 
+class TokenSerializer(Serializer):
+    def get_dump_object(self, obj):
+        return {"token":obj.token,"is_admin":obj.admin_permission,"is_author":obj.author_permission} 
+
 def login(request):
     body = json.loads(request.body.decode("utf-8"))
     password_l = hash.make_password(body['password'],salt='123') #Сделать соль конфигурируемой
     username_l = body['username']
     try:
-        _ = User.objects.get(username=username_l,password=password_l)
-        return HttpResponse(status=200)
+        user = User.objects.get(username=username_l,password=password_l)
+        token = Token()
+        token.owner_id = user
+        token.admin_permission = user.is_staff
+        try:
+            _ = Author.objects.get(id=user.id)
+            token.author_permission=True
+        except ObjectDoesNotExist:
+            pass
+        token.token = uuid.uuid4()
+        token.save()
+        data = TokenSerializer().serialize([token])
+        return HttpResponse(data,status=200)
     except ObjectDoesNotExist:
         return HttpResponse(status=401)

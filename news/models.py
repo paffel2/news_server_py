@@ -38,8 +38,17 @@ class Author(models.Model):
     bio = models.TextField(null=True)
     
 
+class Token(models.Model):
+    token = models.UUIDField()
+    owner_id = models.OneToOneField(User, on_delete=models.CASCADE,primary_key=True)
+    admin_permission = models.BooleanField(default=False)
+    author_permission = models.BooleanField(default=False)
 
-
+    class Meta:
+        ordering = ["owner_id"]
+    
+    def __str__(self):
+        return (self.token)
 
 '''
 class News(models.Model):
