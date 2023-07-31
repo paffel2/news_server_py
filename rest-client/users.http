@@ -31,3 +31,15 @@ content-type: application/json
 }
 
 ###
+
+# @name login
+
+GET  http://127.0.0.1:8000/login/  HTTP/1.1
+content-type: application/json
+
+{
+    "username": "username",
+    "password": "password"
+}
+
+###
