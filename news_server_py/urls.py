@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.urls import path
 from news.views import users 
 from news.views import categories
-from news.views import tags 
+from news.views import tags
+from news.views import authors
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('category/', categories.category_handle),
     path('tags/', tags.tags_handle),
-    path('user/', users.user_handle)
+    path('user/', users.user_handle),
+    path('authors/', authors.author_handle)
 ]

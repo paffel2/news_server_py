@@ -1,0 +1,50 @@
+# @name make author
+
+POST  http://127.0.0.1:8000/authors/  HTTP/1.1
+content-type: application/json
+
+{
+    "id": 1
+}
+
+###
+
+# @name check author
+
+GET  http://127.0.0.1:8000/authors/  HTTP/1.1
+content-type: application/json
+
+{
+    "id": 2
+}
+
+###
+
+# @name get authors
+
+GET  http://127.0.0.1:8000/authors/  HTTP/1.1
+
+###
+
+# @name delete author
+
+DELETE  http://127.0.0.1:8000/authors/  HTTP/1.1
+content-type: application/json
+
+{
+    "id": 1
+}
+
+###
+
+# @name update author
+
+PUT  http://127.0.0.1:8000/authors/  HTTP/1.1
+content-type: application/json
+
+{
+    "bio": "",
+    "id": 1
+}
+
+###
