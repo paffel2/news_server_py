@@ -1,7 +1,5 @@
 from django.http import HttpResponse
-from ..models import *
-from django.core.serializers.json import Serializer
-from django.core.serializers import *
+from ..models import Category
 import json
 from .shared import *
 
@@ -39,6 +37,13 @@ def update_category(request):
     category.save()
     return HttpResponse(status=201)
 
+def delete_category(request):
+    body = json.loads(request.body.decode("utf-8"))
+    category_id = int(body['id'])
+    category = Category.objects.get(id=category_id)
+    category.delete()
+    return HttpResponse(status=200)
+
 def category_handle(request):
         if request.method == 'GET':
            return get_categories()
@@ -46,3 +51,5 @@ def category_handle(request):
            return create_category(request)
         elif request.method == 'PUT':
            return update_category(request)
+        elif request.method == 'DELETE':
+              return delete_category(request)

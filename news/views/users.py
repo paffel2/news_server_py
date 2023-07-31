@@ -1,7 +1,6 @@
 from django.http import HttpResponse
-from ..models import *
+from ..models import User
 from django.core.serializers.json import Serializer
-from django.core.serializers import *
 import json
 
 class UserSerializer(Serializer):
@@ -25,8 +24,17 @@ def users_list(request):
     data =  UserSerializer().serialize(User.objects.all())
     return HttpResponse(data, content_type="application/json")
 
+def delete_user(request):
+    body = json.loads(request.body.decode("utf-8"))
+    user_id = int(body['id'])
+    user = User.objects.get(id=user_id)
+    user.delete()
+    return HttpResponse(status=200)
+
 def user_handle(request):
     if request.method == 'GET':
         return users_list(request)
     elif request.method == 'POST':
         return registration(request)
+    elif request.method == 'DELETE':
+        return delete_user(request)

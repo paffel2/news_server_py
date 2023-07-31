@@ -1,0 +1,38 @@
+# @name add tags
+POST  http://127.0.0.1:8000/tags/  HTTP/1.1
+content-type: application/json
+
+{
+    "tag_name": "cringe"
+}
+
+###
+
+# @name get tags
+
+GET  http://127.0.0.1:8000/tags/  HTTP/1.1
+
+###
+
+# @name update tag
+
+PUT  http://127.0.0.1:8000/tags/  HTTP/1.1
+content-type: application/json
+
+{
+    "tag_name": "base",
+    "id": 1
+}
+
+###
+
+# @name delete tag
+
+DELETE  http://127.0.0.1:8000/tags/  HTTP/1.1
+content-type: application/json
+
+{
+    "id": 1
+}
+
+###
