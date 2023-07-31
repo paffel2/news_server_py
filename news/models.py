@@ -24,7 +24,7 @@ class Tag(models.Model):
         return self.tag_name
 
 class User(AbstractUser):
-    is_author = models.BooleanField(default=False)
+    #is_author = models.BooleanField(default=False)
     id = models.AutoField(primary_key=True)
 
     class Meta:
@@ -32,6 +32,10 @@ class User(AbstractUser):
     
     def __str__(self):
         return (self.first_name + " " + self.last_name)
+
+class Author(models.Model):
+    id = models.OneToOneField(User, on_delete=models.CASCADE,primary_key=True)
+    bio = models.TextField()
     
 
 
