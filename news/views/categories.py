@@ -4,25 +4,28 @@ import json
 from .shared import *
 
 
-def create_category(request):
+def create_category(body):
+        #body = json.loads(request.body.decode("utf-8"))
+        #uuid_token = body['token']
+        #if is_admin(uuid_token):
         category = Category()
-        body = json.loads(request.body.decode("utf-8"))
+        #        body = json.loads(request.body.decode("utf-8"))
         category.category_name = body['category_name'] #Добавить проверки и исключения
         if 'parent_category' in body:
-            parent_id = int(body['parent_category'])
-            parent = Category.objects.get(id=parent_id)
-            category.parent_category = parent #Добавить проверки и исключения
+                        parent_id = int(body['parent_category'])
+                        parent = Category.objects.get(id=parent_id)
+                        category.parent_category = parent #Добавить проверки и исключения
             
         category.save()
         return HttpResponse(status=201)
-
+        
 def get_categories():
         data = CustomSerializer().serialize(Category.objects.all())
         return HttpResponse(data, content_type="application/json")
 
-def update_category(request):
+def update_category(body):
     
-    body = json.loads(request.body.decode("utf-8"))
+    #body = json.loads(request.body.decode("utf-8"))
     category_id = int(body['id'])
     category = Category.objects.get(id=category_id)
     #Добавить проверку что тело не пустое
@@ -37,8 +40,8 @@ def update_category(request):
     category.save()
     return HttpResponse(status=201)
 
-def delete_category(request):
-    body = json.loads(request.body.decode("utf-8"))
+def delete_category(body):
+    #body = json.loads(request.body.decode("utf-8"))
     category_id = int(body['id'])
     category = Category.objects.get(id=category_id)
     category.delete()
@@ -47,9 +50,15 @@ def delete_category(request):
 def category_handle(request):
         if request.method == 'GET':
            return get_categories()
-        elif request.method == 'POST':
-           return create_category(request)
-        elif request.method == 'PUT':
-           return update_category(request)
-        elif request.method == 'DELETE':
-              return delete_category(request)
+        else:
+           body = json.loads(request.body.decode("utf-8"))
+           uuid_token = body['token']
+           if is_admin(uuid_token):
+                if request.method == 'POST':
+                        return create_category(body)
+                elif request.method == 'PUT':
+                        return update_category(body)
+                elif request.method == 'DELETE':
+                        return delete_category(body)
+           else:
+                return HttpResponse(status=404)
