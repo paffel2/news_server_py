@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse,FileResponse
 from ..models import Image, ImageForm
 from django.core.serializers.json import Serializer
 import json
@@ -18,3 +18,8 @@ def upload_image(request):
     else:
         print("invalid")
         return HttpResponse(status=404)
+
+def get_image(_,image_id):
+    image = Image.objects.get(id=image_id)
+    return FileResponse(image.image)
+# добавить обработку ошибок    
