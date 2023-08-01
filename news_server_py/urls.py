@@ -20,6 +20,7 @@ from news.views import users
 from news.views import categories
 from news.views import tags
 from news.views import authors
+from news.views import images
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +28,6 @@ urlpatterns = [
     path('tags/', tags.tags_handle),
     path('user/', users.user_handle),
     path('authors/', authors.author_handle),
-    path('login/',users.login)
+    path('login/',users.login),
+    path('images/',images.upload_image)
 ]

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django import forms
 # Create your models here.
 
 class Category(models.Model):
@@ -49,6 +50,17 @@ class Token(models.Model):
     
     def __str__(self):
         return (self.token)
+
+class Image(models.Model):
+    image = models.ImageField(upload_to='images')
+
+    def __str__(self):
+        return self.image.name
+    
+class ImageForm(forms.ModelForm):
+    class Meta:
+        model = Image
+        fields = ['image']
 
 '''
 class News(models.Model):
