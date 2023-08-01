@@ -5,6 +5,7 @@ import json
 import django.contrib.auth.hashers as hash
 from django.core.exceptions import ObjectDoesNotExist
 import uuid
+from .shared import *
 
 class UserSerializer(Serializer):
     def get_dump_object(self, obj):
@@ -23,20 +24,25 @@ def registration(request): #изучить про шифрование и дос
     user.save()
     return HttpResponse(status=201)
 
-def users_list(request):
+def users_list():
     data =  UserSerializer().serialize(User.objects.all())
     return HttpResponse(data, content_type="application/json")
 
 def delete_user(request):
     body = json.loads(request.body.decode("utf-8"))
-    user_id = int(body['id'])
-    user = User.objects.get(id=user_id)
-    user.delete()
-    return HttpResponse(status=200)
+    uuid_token = body['token']
+    if is_admin(uuid_token):
+        user_id = int(body['id'])
+        user = User.objects.get(id=user_id)
+        user.delete()
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=404)
+
 
 def user_handle(request):
     if request.method == 'GET':
-        return users_list(request)
+        return users_list()
     elif request.method == 'POST':
         return registration(request)
     elif request.method == 'DELETE':
