@@ -23,3 +23,18 @@ def get_image(_,image_id):
     image = Image.objects.get(id=image_id)
     return FileResponse(image.image)
 # добавить обработку ошибок    
+
+def get_image_urls():
+    images = Image.objects.all()
+    list_of_urls = []
+    for i in images:
+        image_id = i.id
+        list_of_urls.append(to_image_urls(image_id))
+    return HttpResponse(list_of_urls)
+
+
+def images_handler(request):
+    if request.method == 'GET':
+        return get_image_urls()
+    elif request.method == 'POST':
+        return upload_image(request)

@@ -1,6 +1,7 @@
 from django.core.serializers.json import Serializer
 from ..models import *
 from django.core.exceptions import ObjectDoesNotExist
+from news_server_py.settings import ALLOWED_HOSTS,ALLOWED_PORT
 
 
 class CustomSerializer(Serializer):
@@ -20,3 +21,10 @@ def is_author(token_uuid):
         return token.author_permission #возможно стоит сделать проверку по id новости и драфта
     except ObjectDoesNotExist:
         return False
+
+def to_image_urls(id):
+    if ALLOWED_HOSTS != []:
+        str = f'http://{ALLOWED_HOSTS[0]}:{ALLOWED_PORT}/images/{id}'
+        return str
+    else:
+        return "error" #добавить обработку исключений
