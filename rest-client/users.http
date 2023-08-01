@@ -9,7 +9,7 @@ content-type: application/json
     "first_name": "first_name",
     "last_name": "last_name",
     "username": "username",
-    "password": "password",
+    "password": "admin",
     "email": "email"
 }
 
@@ -39,8 +39,8 @@ GET  http://127.0.0.1:8000/login/  HTTP/1.1
 content-type: application/json
 
 {
-    "username": "username",
-    "password": "password"
+    "username": "admin",
+    "password": "admin"
 }
 
 ###

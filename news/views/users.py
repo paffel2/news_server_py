@@ -18,7 +18,7 @@ def registration(request): #изучить про шифрование и дос
     user = User()
     user.first_name = body['first_name']
     user.last_name = body['last_name']
-    user.email = body['email']
+    user.email = body['email'] #добавить проверку правильности адреса
     user.username = body['username']
     user.password = hash.make_password(body['password'],salt='123')
     user.save()
