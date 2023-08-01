@@ -6,6 +6,8 @@ import django.contrib.auth.hashers as hash
 from django.core.exceptions import ObjectDoesNotExist
 import uuid
 from .shared import *
+from email_validator import validate_email, EmailNotValidError
+
 
 class UserSerializer(Serializer):
     def get_dump_object(self, obj):
@@ -14,15 +16,20 @@ class UserSerializer(Serializer):
 #users
 
 def registration(request): #изучить про шифрование и доступ
-    body = json.loads(request.body.decode("utf-8"))
-    user = User()
-    user.first_name = body['first_name']
-    user.last_name = body['last_name']
-    user.email = body['email'] #добавить проверку правильности адреса
-    user.username = body['username']
-    user.password = hash.make_password(body['password'],salt='123')
-    user.save()
-    return HttpResponse(status=201)
+    try:
+        body = json.loads(request.body.decode("utf-8"))
+        user = User()
+        user.first_name = body['first_name']
+        user.last_name = body['last_name']
+        email_info = validate_email(body['email'],check_deliverability=False)
+        email = email_info.normalized
+        user.email = email
+        user.username = body['username']
+        user.password = hash.make_password(body['password'],salt='123')
+        user.save()
+        return HttpResponse(status=201)
+    except EmailNotValidError:
+        return HttpResponse("bad email addres",status=403)
 
 def users_list():
     data =  UserSerializer().serialize(User.objects.all())
