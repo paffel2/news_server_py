@@ -44,6 +44,7 @@ class Token(models.Model):
     owner_id = models.OneToOneField(User, on_delete=models.CASCADE,primary_key=True)
     admin_permission = models.BooleanField(default=False)
     author_permission = models.BooleanField(default=False)
+    creation_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["owner_id"]

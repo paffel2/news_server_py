@@ -53,4 +53,9 @@ token: 8d913a49-3ba3-4c8a-acbe-154fe54ff28a
 
 ###
 
-"efdb552b-4ffd-447e-9beb-c35718728bd8"
+# @name check token
+
+GET  http://127.0.0.1:8000/user/check_token  HTTP/1.1
+token: a51cecd6-710a-4a05-be6f-c42841b4a279
+
+###

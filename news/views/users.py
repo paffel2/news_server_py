@@ -129,3 +129,8 @@ def get_own_user_information(request):
     #костыль используется для того, чтобы избежать списка
     #возможно стоило использовать что-то другое
     return HttpResponse(returning_data,content_type="application/json")
+
+def check_token(request): #тестовый эндпоинт, будет удален, а функционал добавлен, где требуется проверка токена
+    token_uuid = request.META.get('HTTP_TOKEN')
+    result = is_token_valid(token_uuid)
+    return HttpResponse(result) 

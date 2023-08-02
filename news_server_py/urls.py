@@ -31,5 +31,6 @@ urlpatterns = [
     path('authors/', authors.author_handle),
     path('login/',users.login),
     path('images/',images.images_handler),
-    path('images/<int:image_id>/',images.get_image)
+    path('images/<int:image_id>/',images.get_image),
+    path('user/check_token/',users.check_token)
 ]

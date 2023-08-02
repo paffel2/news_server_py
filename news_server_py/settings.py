@@ -162,3 +162,5 @@ LOGGING = {
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 SALT = '123'
+
+TOKEN_LIFE_TIME = 86400
