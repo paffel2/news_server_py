@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import uuid
 from .shared import *
 from email_validator import validate_email, EmailNotValidError
-from django.forms.models import model_to_dict
+from news_server_py.settings import SALT
 
 
 class UserShortInfoSerializer(Serializer):
@@ -31,24 +31,46 @@ def registration(request): #изучить про шифрование и дос
         email = email_info.normalized
         user.email = email
         user.username = body['username']
-        user.password = hash.make_password(body['password'],salt='123')
-        user.save()
-        return HttpResponse(status=201)
+        user.password = hash.make_password(body['password'],salt=SALT)
+        try:
+            user.save()
+        except ValueError as e:
+            #добавить логи
+            return HttpResponse(status=403)
+        else:
+            return HttpResponse(status=201)
     except EmailNotValidError:
         return HttpResponse("bad email addres",status=403)
+    except json.JSONDecodeError:
+        return HttpResponse("bad json format", status=403)
+    except KeyError as e:
+        return HttpResponse(f'not found field {e}',status=403)
+    except Exception as e:
+        return HttpResponse(status=500)
 
 def users_list(_):
-    data =  UserShortInfoSerializer().serialize(User.objects.all())
-    return HttpResponse(data, content_type="application/json")
+    try:
+        data =  UserShortInfoSerializer().serialize(User.objects.all())
+    except Exception as e:
+        return HttpResponse(status=500)
+    else:
+        return HttpResponse(data, content_type="application/json")
 
 def delete_user(request):
-    body = json.loads(request.body.decode("utf-8"))
-    uuid_token = body['token']
-    if is_admin(uuid_token):
-        user_id = int(body['id'])
-        user = User.objects.get(id=user_id)
-        user.delete()
-        return HttpResponse(status=200)
+    token_uuid = request.META.get('HTTP_TOKEN')
+    if is_admin(token_uuid):
+        try:
+            body = json.loads(request.body.decode("utf-8"))
+            user_id = int(body['id'])
+            user = User.objects.get(id=user_id)
+            user.delete()
+            return HttpResponse(status=200)
+        except json.JSONDecodeError:
+            return HttpResponse("bad json format", status=403)
+        except KeyError as e:
+            return HttpResponse(f'not found field {e}',status=403)
+        except Exception as e:
+            return HttpResponse(e,status=500)
     else:
         return HttpResponse(status=404)
 
@@ -68,10 +90,13 @@ class TokenSerializer(Serializer):
 
 def login(request):
     body = json.loads(request.body.decode("utf-8"))
-    password_l = hash.make_password(body['password'],salt='123') #Сделать соль конфигурируемой
+    password_l = hash.make_password(body['password'],salt=SALT)
     username_l = body['username']
     try:
         user = User.objects.get(username=username_l,password=password_l)
+    except ObjectDoesNotExist:
+        return HttpResponse("wrong username or password", status=401)
+    else:
         token = Token()
         token.owner_id = user
         token.admin_permission = user.is_staff
@@ -80,12 +105,18 @@ def login(request):
             token.author_permission=True
         except ObjectDoesNotExist:
             pass
+        except Exception:
+            return HttpResponse(status=500)
         token.token = uuid.uuid4()
-        token.save()
-        data = TokenSerializer().serialize([token])
-        return HttpResponse(data,status=200)
-    except ObjectDoesNotExist:
-        return HttpResponse(status=401)
+        try:
+            token.save()
+        except Exception:
+            return HttpResponse(status=500)
+        else:
+            data = TokenSerializer().serialize([token])
+            struct = json.loads(data)
+            returning_data = json.dumps(struct[0])
+            return HttpResponse(returning_data,status=200)
     
 def get_own_user_information(request):
     token_uuid = request.META.get('HTTP_TOKEN')
