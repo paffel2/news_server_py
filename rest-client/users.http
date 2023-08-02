@@ -17,7 +17,7 @@ content-type: application/json
 
 # @name users list
 
-GET  http://127.0.0.1:8000/user/  HTTP/1.1
+GET  http://127.0.0.1:8000/user/list/  HTTP/1.1
 
 ###
 
@@ -39,8 +39,16 @@ GET  http://127.0.0.1:8000/login/  HTTP/1.1
 content-type: application/json
 
 {
-    "username": "admin",
-    "password": "admin"
+    "username": "username",
+    "password": "password"
 }
+
+###
+
+# @name user info
+
+GET  http://127.0.0.1:8000/user/  HTTP/1.1
+content-type: application/json
+token: 8d913a49-3ba3-4c8a-acbe-154fe54ff28a
 
 ###

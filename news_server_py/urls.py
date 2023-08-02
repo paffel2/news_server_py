@@ -27,6 +27,7 @@ urlpatterns = [
     path('category/', categories.category_handle),
     path('tags/', tags.tags_handle),
     path('user/', users.user_handle),
+    path('user/list/',users.users_list),
     path('authors/', authors.author_handle),
     path('login/',users.login),
     path('images/',images.images_handler),

@@ -7,11 +7,17 @@ from django.core.exceptions import ObjectDoesNotExist
 import uuid
 from .shared import *
 from email_validator import validate_email, EmailNotValidError
+from django.forms.models import model_to_dict
 
 
-class UserSerializer(Serializer):
+class UserShortInfoSerializer(Serializer):
     def get_dump_object(self, obj):
         return {"id":obj.id, "first_name":obj.first_name,"last_name":obj.last_name,"date_joined":obj.date_joined} 
+
+class UserInfoSerializer(Serializer):
+    def get_dump_object(self, obj):
+        return {"id":obj.id, "first_name":obj.first_name,"last_name":obj.last_name,"date_joined":obj.date_joined, "email":obj.email,"is_admin":obj.is_staff} 
+
 
 #users
 
@@ -31,8 +37,8 @@ def registration(request): #изучить про шифрование и дос
     except EmailNotValidError:
         return HttpResponse("bad email addres",status=403)
 
-def users_list():
-    data =  UserSerializer().serialize(User.objects.all())
+def users_list(_):
+    data =  UserShortInfoSerializer().serialize(User.objects.all())
     return HttpResponse(data, content_type="application/json")
 
 def delete_user(request):
@@ -49,7 +55,7 @@ def delete_user(request):
 
 def user_handle(request):
     if request.method == 'GET':
-        return users_list()
+        return get_own_user_information(request)
     elif request.method == 'POST':
         return registration(request)
     elif request.method == 'DELETE':
@@ -80,3 +86,15 @@ def login(request):
         return HttpResponse(data,status=200)
     except ObjectDoesNotExist:
         return HttpResponse(status=401)
+    
+def get_own_user_information(request):
+    token_uuid = request.META.get('HTTP_TOKEN')
+    token = Token.objects.get(token=token_uuid)
+    user_info = User.objects.get(id=token.owner_id.id)
+    #здесь используется костыль для сериализации данных в json
+    data = UserInfoSerializer().serialize([user_info]) #сначала сериализуем объект, упаковав его в список, так как требуется, чтобы объект был вгутри iterable
+    struct = json.loads(data) #десериализуем объект обратно
+    returning_data = json.dumps(struct[0]) #сериализуем его снова (вариант с преобразованием model_to_dict не работает, так как вылетает ошибка при преобразовании времени и uuid)
+    #костыль используется для того, чтобы избежать списка
+    #возможно стоило использовать что-то другое
+    return HttpResponse(returning_data,content_type="application/json")
