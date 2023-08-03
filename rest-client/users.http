@@ -2,7 +2,7 @@
 
 # @name registration
 
-POST  http://127.0.0.1:8000/user/  HTTP/1.1
+POST  http://127.0.0.1:8000/api/users/  HTTP/1.1
 content-type: application/json
 
 {
@@ -17,25 +17,21 @@ content-type: application/json
 
 # @name users list
 
-GET  http://127.0.0.1:8000/user/list/  HTTP/1.1
+GET  http://127.0.0.1:8000/api/users/  HTTP/1.1
 
 ###
 
 # @name delete user
 
-DELETE  http://127.0.0.1:8000/user/  HTTP/1.1
+DELETE  http://127.0.0.1:8000/api/users/?id=1  HTTP/1.1
 content-type: application/json
-token: 8d913a49-3ba3-4c8a-acbe-154fe54ff28a
-
-{
-    "id": 3
-}
+token: 1cd40354-52a2-459c-81ae-dbbd127d128b
 
 ###
 
 # @name login
 
-GET  http://127.0.0.1:8000/login/  HTTP/1.1
+POST  http://127.0.0.1:8000/api/login/  HTTP/1.1
 content-type: application/json
 
 {
@@ -45,11 +41,11 @@ content-type: application/json
 
 ###
 
-# @name user info
+# @name profile info
 
-GET  http://127.0.0.1:8000/user/  HTTP/1.1
+GET  http://127.0.0.1:8000/api/profile/  HTTP/1.1
 content-type: application/json
-token: 8d913a49-3ba3-4c8a-acbe-154fe54ff28a
+token: 05acfa1d-4d06-4607-a381-ac50a9a58d3f
 
 ###
 

@@ -1,5 +1,4 @@
 Django
 email-validator
-django-rest-swagger
 drf-yasg
 django-rest-framework

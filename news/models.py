@@ -25,7 +25,6 @@ class Tag(models.Model):
         return self.tag_name
 
 class User(AbstractUser):
-    #is_author = models.BooleanField(default=False)
     id = models.AutoField(primary_key=True)
 
     class Meta:
