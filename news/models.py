@@ -12,7 +12,7 @@ class Category(models.Model):
         ordering = ["id", "category_name"]
 
     def __str__(self):
-        return self.category_name
+        return self.category_name + " " + str(self.id) + " " + str(self.parent_category)
 
 class Tag(models.Model):
     id = models.AutoField(primary_key=True)

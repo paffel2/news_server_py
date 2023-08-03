@@ -1,11 +1,25 @@
-from django.http import HttpResponse
-from ..models import Category
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from ..serializers import *
+from ..models import *
 import json
-from .shared import *
+from ..views.shared import *
+from drf_yasg.utils import swagger_auto_schema
 
-
-def create_category(body):
-        #body = json.loads(request.body.decode("utf-8"))
+class CategoryAPIView(APIView):
+    serializer_class = CategorySerializer
+    
+    @swagger_auto_schema(operation_description="get list of categories", responses={200: 'successfull', 'other':'something went wrong'})
+    def get(self, _):
+        categories = Category.objects.all()
+        print(categories)
+        serializer = CategorySerializer(categories,many=True)
+        
+        #return Response(status=200)
+        return Response(serializer.data)
+    
+    def post(self,request):
+        body = json.loads(request.body.decode("utf-8"))
         #uuid_token = body['token']
         #if is_admin(uuid_token):
         category = Category()
@@ -17,48 +31,27 @@ def create_category(body):
                         category.parent_category = parent #Добавить проверки и исключения
             
         category.save()
-        return HttpResponse(status=201)
-        
-def get_categories():
-        data = CustomSerializer().serialize(Category.objects.all())
-        return HttpResponse(data, content_type="application/json")
-
-def update_category(body):
+        return Response(status=201)
     
-    #body = json.loads(request.body.decode("utf-8"))
-    category_id = int(body['id'])
-    category = Category.objects.get(id=category_id)
+    def put(self,request):
+        body = json.loads(request.body.decode("utf-8"))
+        category_id = int(body['id'])
+        category = Category.objects.get(id=category_id)
     #Добавить проверку что тело не пустое
-    if 'parent_category' in body:
+        if 'parent_category' in body:
             parent_id = int(body['parent_category'])
             parent = Category.objects.get(id=parent_id)
             category.parent_category = parent #Добавить проверки и исключения
     
-    if 'category_name' in body:
+        if 'category_name' in body:
             category_name = body['category_name']
             category.category_name = category_name #Добавить проверки и исключения
-    category.save()
-    return HttpResponse(status=201)
-
-def delete_category(body):
-    #body = json.loads(request.body.decode("utf-8"))
-    category_id = int(body['id'])
-    category = Category.objects.get(id=category_id)
-    category.delete()
-    return HttpResponse(status=200)
-
-def category_handle(request):
-        if request.method == 'GET':
-           return get_categories()
-        else:
-           body = json.loads(request.body.decode("utf-8"))
-           uuid_token = body['token']
-           if is_admin(uuid_token):
-                if request.method == 'POST':
-                        return create_category(body)
-                elif request.method == 'PUT':
-                        return update_category(body)
-                elif request.method == 'DELETE':
-                        return delete_category(body)
-           else:
-                return HttpResponse(status=404)
+        category.save()
+        return Response(status=201)
+    
+    def delete(self,request):
+        body = json.loads(request.body.decode("utf-8"))
+        category_id = int(body['id'])
+        category = Category.objects.get(id=category_id)
+        category.delete()
+        return Response(status=200)
