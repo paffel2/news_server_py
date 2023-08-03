@@ -9,13 +9,10 @@ from drf_yasg.utils import swagger_auto_schema
 class CategoryAPIView(APIView):
     serializer_class = CategorySerializer
     
-    @swagger_auto_schema(operation_description="get list of categories", responses={200: 'successfull', 'other':'something went wrong'})
+    @swagger_auto_schema(operation_description="Get list of categories", responses={200: 'successfull', 'other':'something went wrong'})
     def get(self, _):
         categories = Category.objects.all()
-        print(categories)
         serializer = CategorySerializer(categories,many=True)
-        
-        #return Response(status=200)
         return Response(serializer.data)
     
     def post(self,request):
