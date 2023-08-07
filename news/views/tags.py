@@ -7,8 +7,7 @@ from ..models import *
 import json
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import JSONParser
-
-
+from rest_framework import serializers
 
 
 #id_param = openapi.Parameter('id', openapi.IN_QUERY, description="object id", type=openapi.TYPE_INTEGER)
@@ -23,7 +22,6 @@ class TagsAPIView(APIView):
 
     @swagger_auto_schema(operation_description="Create tag", responses={200: 'successfull', 'other':'something went wrong'},request_body=PutTagSerializer)
     def post(self,request):
-        #body = json.loads(request.body.decode("utf-8"))
         try:
             data = JSONParser().parse(request)
             serializer_req = PutTagSerializer(data=data)
@@ -32,7 +30,14 @@ class TagsAPIView(APIView):
                 return Response(status=201)
             else:
                 Response("bad json format", status=403)
-        except Exception:
+        except AssertionError:
+            print("tag not added")
+            return Response(status=404)
+        except serializers.ValidationError as e:
+            print(e) #добавить описание логам
+            return Response(status=500)
+        except Exception as e:
+            print(e)
             return Response(status=500)
     
     @swagger_auto_schema(operation_description="Update tag", responses={200: 'successfull', 'other':'something went wrong'},request_body=TagSerializer)
@@ -48,6 +53,9 @@ class TagsAPIView(APIView):
                 return Response(status=201)
             else:
                 Response("bad json format", status=403)
+        except serializers.ValidationError as e:
+            print(e) #добавить описание логам
+            return Response(status=500)
         except Exception as e:
             print(e)
             return Response(status=500)

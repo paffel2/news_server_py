@@ -3,8 +3,8 @@ POST  http://127.0.0.1:8000/api/categories/  HTTP/1.1
 content-type: application/json
 
 {
-    "category_name": "Football1",
-    "token": "cd61d773-abfe-44e3-ae30-84ec225c9bcf"
+    "category_name": "Football3",
+    "parent_category": 3
 }
 
 ###

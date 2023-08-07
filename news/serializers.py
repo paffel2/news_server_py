@@ -19,6 +19,14 @@ class PutCategorySerializer(serializers.ModelSerializer):
 
 class CategorySerializer(PutCategorySerializer):
     id = serializers.IntegerField()
+
+    def update(self,instance,validated_data):
+        instance.category_name = validated_data.get("category_name",instance.category_name)
+        instance.id = validated_data.get("id",instance.id)
+        instance.parent_category = validated_data.get("parent_category",instance.parent_category)
+        instance.save()
+        return instance
+
     class Meta:
         model = Category
         fields = ['id','category_name','parent_category']
