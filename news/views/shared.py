@@ -25,7 +25,7 @@ def is_author(token_uuid):
 
 def to_image_urls(id):
     if ALLOWED_HOSTS != []:
-        str = f'http://{ALLOWED_HOSTS[0]}:{ALLOWED_PORT}/images/{id}'
+        str = f'http://{ALLOWED_HOSTS[0]}:{ALLOWED_PORT}/api/images/{id}'
         return str
     else:
         return "error" #добавить обработку исключений

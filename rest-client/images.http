@@ -1,24 +1,24 @@
 #curl -X 'POST' -G "http://localhost:8000/images/" -F "image"="@1.png" -F "title"="image"
 
-POST http://127.0.0.1:8000/images/ HTTP/1.1
+POST http://127.0.0.1:8000/api/images/ HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="image"; filename="new.png"
 Content-Type: image/png
 
-< ./new.png
+< ./1.png
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ###
 
 # get image
-GET http://127.0.0.1:8000/images/1 HTTP/1.1
+GET http://127.0.0.1:8000/api/images/1 HTTP/1.1
 
 ###
 
 # get images urls
-GET http://127.0.0.1:8000/images/ HTTP/1.1
+GET http://127.0.0.1:8000/api/images/ HTTP/1.1
 
 ###
