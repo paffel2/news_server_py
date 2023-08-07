@@ -1,3 +1,4 @@
+'''
 from django.http import HttpResponse
 from ..models import *
 from django.core.serializers.json import Serializer
@@ -62,3 +63,45 @@ def author_handle(request):
         return delete_author(request)
     elif request.method == 'PUT':
         return update_author(request)
+'''
+
+
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from ..serializers import PutAuthorSerializer
+from ..views.shared import *
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.parsers import JSONParser
+from rest_framework import serializers
+from django.db.utils import IntegrityError 
+
+
+class AuthorsAPIView(APIView):
+    '''
+    @swagger_auto_schema(operation_description="Get list of categories", responses={200: 'successfull', 'other':'something went wrong'})
+    def get(self, _):
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories,many=True)
+        return Response(serializer.data)'''
+    
+    @swagger_auto_schema(operation_description="Create author", responses={200: 'successfull', 'other':'something went wrong'},request_body=PutAuthorSerializer)
+    def post(self,request):
+        try:
+            data = JSONParser().parse(request)
+            serializer_req = PutAuthorSerializer(data=data)
+            if serializer_req.is_valid(raise_exception=True):
+                serializer_req.save()
+                return Response (status=201)
+
+            else:
+                return Response("bad json format", status=403)
+        except serializers.ValidationError as e:
+            print(e) #добавить описание логам
+            return Response(status=500)
+        except IntegrityError as e:
+            if 'FOREIGN KEY constraint failed' in e.args[0]:
+                return Response("user not exists", status=403)
+            return Response(status=404)
+        except Exception as e:
+            print(e)
+            return Response(status=500)

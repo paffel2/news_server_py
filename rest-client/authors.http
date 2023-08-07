@@ -1,10 +1,10 @@
 # @name make author
 
-POST  http://127.0.0.1:8000/authors/  HTTP/1.1
+POST  http://127.0.0.1:8000/api/authors/  HTTP/1.1
 content-type: application/json
 
 {
-    "id": 1
+    "id": 3
 }
 
 ###
@@ -15,7 +15,7 @@ GET  http://127.0.0.1:8000/authors/  HTTP/1.1
 content-type: application/json
 
 {
-    "id": 2
+    "id": 1
 }
 
 ###

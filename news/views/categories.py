@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..serializers import id_body, CategorySerializer, PutCategorySerializer, id_param
-import json
+from ..serializers import CategorySerializer, PutCategorySerializer, id_param
 from ..views.shared import *
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import JSONParser

@@ -3,8 +3,8 @@ POST  http://127.0.0.1:8000/api/categories/  HTTP/1.1
 content-type: application/json
 
 {
-    "category_name": "Football3",
-    "parent_category": 3
+    "category_name": "FootballSummer",
+    "parent_category": 1
 }
 
 ###
@@ -29,7 +29,7 @@ content-type: application/json
 
 # @name delete categories
 
-DELETE  http://127.0.0.1:8000/api/categories/?id=2  HTTP/1.1
+DELETE  http://127.0.0.1:8000/api/categories/?id=1  HTTP/1.1
 content-type: application/json
 
 ###

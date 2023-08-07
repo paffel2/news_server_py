@@ -94,3 +94,12 @@ class TokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = Token
         fields = ['token']
+
+
+class PutAuthorSerializer(serializers.ModelSerializer):
+    id = serializers.RelatedField(source='User.id',read_only=True)
+    bio = serializers.CharField(max_length=500,required=False)
+
+    class Meta:
+        model = Author
+        fields = ['id','bio']

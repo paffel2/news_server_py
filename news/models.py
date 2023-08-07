@@ -35,8 +35,8 @@ class User(AbstractUser):
 
 class Author(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE,primary_key=True)
-    bio = models.TextField(null=True)
-    
+    bio = models.TextField()
+   
 
 class Token(models.Model):
     token = models.UUIDField()
