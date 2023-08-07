@@ -4,46 +4,32 @@ POST  http://127.0.0.1:8000/api/authors/  HTTP/1.1
 content-type: application/json
 
 {
-    "id": 3
-}
-
-###
-
-# @name check author
-
-GET  http://127.0.0.1:8000/authors/  HTTP/1.1
-content-type: application/json
-
-{
-    "id": 1
+    "id": 1,
+    "bio": "hello world"
 }
 
 ###
 
 # @name get authors
 
-GET  http://127.0.0.1:8000/authors/  HTTP/1.1
+GET  http://127.0.0.1:8000/api/authors/  HTTP/1.1
 
 ###
 
 # @name delete author
 
-DELETE  http://127.0.0.1:8000/authors/  HTTP/1.1
+DELETE  http://127.0.0.1:8000/api/authors/?id=1  HTTP/1.1
 content-type: application/json
-
-{
-    "id": 1
-}
 
 ###
 
 # @name update author
 
-PUT  http://127.0.0.1:8000/authors/  HTTP/1.1
+PUT  http://127.0.0.1:8000/api/authors/  HTTP/1.1
 content-type: application/json
 
 {
-    "bio": "",
+    "bio": "cringe",
     "id": 1
 }
 

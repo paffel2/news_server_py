@@ -68,7 +68,7 @@ def author_handle(request):
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..serializers import PutAuthorSerializer
+from ..serializers import PutAuthorSerializer,AuthorInfo,id_param
 from ..views.shared import *
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import JSONParser
@@ -77,31 +77,60 @@ from django.db.utils import IntegrityError
 
 
 class AuthorsAPIView(APIView):
-    '''
-    @swagger_auto_schema(operation_description="Get list of categories", responses={200: 'successfull', 'other':'something went wrong'})
-    def get(self, _):
-        categories = Category.objects.all()
-        serializer = CategorySerializer(categories,many=True)
-        return Response(serializer.data)'''
     
-    @swagger_auto_schema(operation_description="Create author", responses={200: 'successfull', 'other':'something went wrong'},request_body=PutAuthorSerializer)
+    @swagger_auto_schema(operation_description="Get list of authors", responses={200: 'successfull', 'other':'something went wrong'})
+    def get(self, _):
+        #categories = Category.objects.all()
+        authors = Author.objects.all()
+        serializer = AuthorInfo(authors,many=True)
+        return Response(serializer.data)
+    
+    @swagger_auto_schema(operation_description="Create author", responses={201: 'successfull', 'other':'something went wrong'},request_body=PutAuthorSerializer)
     def post(self,request):
         try:
             data = JSONParser().parse(request)
             serializer_req = PutAuthorSerializer(data=data)
-            if serializer_req.is_valid(raise_exception=True):
-                serializer_req.save()
-                return Response (status=201)
-
-            else:
-                return Response("bad json format", status=403)
+            serializer_req.is_valid(raise_exception=True)
+            serializer_req.save()
+            return Response (status=201)
         except serializers.ValidationError as e:
-            print(e) #добавить описание логам
+            print(e)
             return Response(status=500)
         except IntegrityError as e:
             if 'FOREIGN KEY constraint failed' in e.args[0]:
-                return Response("user not exists", status=403)
+               return Response("user not exists", status=403)
             return Response(status=404)
         except Exception as e:
             print(e)
             return Response(status=500)
+    
+    @swagger_auto_schema(operation_description="Update author", responses={200: 'successfull', 'other':'something went wrong'},request_body=PutAuthorSerializer)
+    def put(self,request):
+        try:
+            data = JSONParser().parse(request)
+            serializer_req = PutAuthorSerializer(data=data)
+            serializer_req.is_valid(raise_exception=True)
+            instance = Author.objects.get(id=data['id'])
+            serializer = PutAuthorSerializer(data=data,instance=instance)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(status=201)
+
+        except serializers.ValidationError as e:
+            print("ValidationError:")
+            print(e) #добавить описание логам
+            return Response(status=500)
+        except IntegrityError as e:
+            if 'FOREIGN KEY constraint failed' in e.args[0]:
+               return Response("user not exists", status=403)
+            return Response(status=404)
+        except Exception as e:
+            print(e)
+            return Response(status=500)
+    
+    @swagger_auto_schema(operation_description="Delete author", responses={200: 'successfull', 'other':'something went wrong'},manual_parameters=[id_param('author id')])
+    def delete(self,request):
+        author_id = request.GET.get('id')
+        author = Author.objects.get(id=author_id)
+        author.delete()
+        return Response(status=200)

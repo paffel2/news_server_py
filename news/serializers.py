@@ -97,9 +97,33 @@ class TokenSerializer(serializers.ModelSerializer):
 
 
 class PutAuthorSerializer(serializers.ModelSerializer):
-    id = serializers.RelatedField(source='User.id',read_only=True)
+
+    def update(self,instance,validated_data):
+        instance.bio = validated_data.get("bio",instance.bio)
+        instance.id = validated_data.get("id",instance.id)
+        instance.save()
+        return instance
+    
+    class Meta:
+        model = Author
+        fields = ['id','bio']
+        extra_kwargs = {
+            'id': {'validators': []},
+        }
+    
+
+class AuthorInfo(serializers.ModelSerializer):
     bio = serializers.CharField(max_length=500,required=False)
 
     class Meta:
         model = Author
-        fields = ['id','bio']
+        fields = ['bio']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['username'] = instance.id.username
+        representation['first_name'] = instance.id.first_name
+        representation['last_name'] = instance.id.last_name
+        representation['email'] = instance.id.email
+        representation['date_joined'] = instance.id.date_joined
+        return representation
