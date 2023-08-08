@@ -62,10 +62,21 @@ class ImageForm(forms.ModelForm):
         model = Image
         fields = ['image']
 
-'''
+
 class News(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=250)
     created = models.DateTimeField(auto_now=True)
-    category = models.CharField
-'''
+    category = models.OneToOneField(Category, on_delete=models.CASCADE)
+    #main_image = models.OneToOneField(Image,on_delete=models.SET_NULL,null=True) - подумать, а надо ли оно вообще
+    tags = models.ManyToManyField(Tag)
+    images = models.ManyToManyField(Image)
+    text = models.TextField()
+    author = models.OneToOneField(Author,on_delete=models.SET_NULL,null=True)
+    is_published = models.BooleanField(default=False,null=False)
+
+    class Meta:
+        ordering = ["id","title","category","created",]
+
+    def __str__(self):
+        return self.title
