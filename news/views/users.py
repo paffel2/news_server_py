@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from ..serializers import *
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import JSONParser
+from ..exceptions import *
 
 class UsersAPIView(APIView):
     @swagger_auto_schema(operation_description="Get list of users", responses={200: 'successfull', 'other':'something went wrong'})
@@ -52,20 +53,28 @@ class UsersAPIView(APIView):
     
     def delete(self,request):
         token_uuid = request.META.get('HTTP_TOKEN')
-        if is_admin(token_uuid):
-            try:
+        try:
+            if is_admin(token_uuid):
                 user_id = request.GET.get('id')
                 user = User.objects.get(id=user_id)
                 user.delete()
                 return Response(status=200)
-            except json.JSONDecodeError:
+            else:
+                print("Is not admin")
+                return Response(status=404)
+        except json.JSONDecodeError:
                 return Response("bad json format", status=403)
-            except KeyError as e:
+        except KeyError as e:
                 return Response(f'not found field {e}',status=403)
-            except Exception as e:
-                return Response(e,status=500)
-        else:
+        except TokenExpired:
+            print("Token expired") # сделать нормальные логи
             return Response(status=404)
+        except TokenNotExist:
+            print("Token not exist") # сделать нормальные логи
+            return Response(status=404)
+        except Exception as e:
+            return Response(e,status=500)
+            
 
 class LoginAPIView(APIView):
     @swagger_auto_schema(operation_description="Login", responses={200: 'successfull', 'other':'something went wrong'},
@@ -106,11 +115,24 @@ class ProfileAPIView(APIView):
     @swagger_auto_schema(operation_description="Get profile info", responses={200: 'successfull', 'other':'something went wrong'},
                          manual_parameters=[token_param])
     def get(self,request):
-        token_uuid = request.META.get('HTTP_TOKEN')
-        token = Token.objects.get(token=token_uuid)
-        user_info = User.objects.get(id=token.owner_id.id)
-        serializer = UserInfoSerializer(user_info)
-        return Response(serializer.data) #добавить обработку исключений
+        try:
+            token_uuid = request.META.get('HTTP_TOKEN')
+            token = Token.objects.get(token=token_uuid)
+            if is_token_valid(token):
+                user_info = User.objects.get(id=token.owner_id.id)
+                serializer = UserInfoSerializer(user_info)
+                return Response(serializer.data)
+            else:
+                return Response(status=404)
+        except TokenExpired: 
+            print("Token Expired") #ЛОГИ
+            return Response(status=404) # возможно стоит вернуть сообщение об истекшем токене
+        except ObjectDoesNotExist:
+            print("User not exist, but token exist")
+            return Response(status=404)
+        except Exception as e:
+            print(f'Something wrong {e}')
+            return Response(status=404)
 
 
 '''

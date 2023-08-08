@@ -80,7 +80,6 @@ class AuthorsAPIView(APIView):
     
     @swagger_auto_schema(operation_description="Get list of authors", responses={200: 'successfull', 'other':'something went wrong'})
     def get(self, _):
-        #categories = Category.objects.all()
         authors = Author.objects.all()
         serializer = AuthorInfo(authors,many=True)
         return Response(serializer.data)
