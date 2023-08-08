@@ -2,6 +2,7 @@
 
 POST  http://127.0.0.1:8000/api/authors/  HTTP/1.1
 content-type: application/json
+token: 506d7fc0-133e-4813-9f66-14de2e9fd4b9
 
 {
     "id": 1,
@@ -18,8 +19,9 @@ GET  http://127.0.0.1:8000/api/authors/  HTTP/1.1
 
 # @name delete author
 
-DELETE  http://127.0.0.1:8000/api/authors/?id=1  HTTP/1.1
+DELETE  http://127.0.0.1:8000/api/authors/?id=2  HTTP/1.1
 content-type: application/json
+token: 0db5a3ab-2a90-4cab-8cab-f388b1ac0d70
 
 ###
 

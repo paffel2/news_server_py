@@ -80,18 +80,27 @@ class AuthorsAPIView(APIView):
     
     @swagger_auto_schema(operation_description="Get list of authors", responses={200: 'successfull', 'other':'something went wrong'})
     def get(self, _):
-        authors = Author.objects.all()
-        serializer = AuthorInfo(authors,many=True)
-        return Response(serializer.data)
+        try:
+            authors = Author.objects.all()
+            serializer = AuthorInfo(authors,many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            print(f'Something went wrong {e}')
+            return Response(status=500)
     
     @swagger_auto_schema(operation_description="Create author", responses={201: 'successfull', 'other':'something went wrong'},request_body=PutAuthorSerializer)
     def post(self,request):
         try:
-            data = JSONParser().parse(request)
-            serializer_req = PutAuthorSerializer(data=data)
-            serializer_req.is_valid(raise_exception=True)
-            serializer_req.save()
-            return Response (status=201)
+            token_uuid = request.META.get('HTTP_TOKEN')
+            if is_admin(token_uuid):
+                data = JSONParser().parse(request)
+                serializer_req = PutAuthorSerializer(data=data)
+                serializer_req.is_valid(raise_exception=True)
+                serializer_req.save()
+                return Response (status=201)
+            else:
+                print("Not admin")
+                return Response(status=404)
         except serializers.ValidationError as e:
             print(e)
             return Response(status=500)
@@ -99,21 +108,32 @@ class AuthorsAPIView(APIView):
             if 'FOREIGN KEY constraint failed' in e.args[0]:
                return Response("user not exists", status=403)
             return Response(status=404)
+        except TokenExpired:
+            print("Token expired") # сделать нормальные логи
+            return Response(status=404)
+        except Token.DoesNotExist:
+            print("Token not exist") # сделать нормальные логи
+            return Response(status=404)
         except Exception as e:
-            print(e)
+            print(f'Something went wrong {e}')
             return Response(status=500)
     
     @swagger_auto_schema(operation_description="Update author", responses={200: 'successfull', 'other':'something went wrong'},request_body=PutAuthorSerializer)
     def put(self,request):
         try:
-            data = JSONParser().parse(request)
-            serializer_req = PutAuthorSerializer(data=data)
-            serializer_req.is_valid(raise_exception=True)
-            instance = Author.objects.get(id=data['id'])
-            serializer = PutAuthorSerializer(data=data,instance=instance)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(status=201)
+            token_uuid = request.META.get('HTTP_TOKEN')
+            if is_admin(token_uuid):
+                data = JSONParser().parse(request)
+                serializer_req = PutAuthorSerializer(data=data)
+                serializer_req.is_valid(raise_exception=True)
+                instance = Author.objects.get(id=data['id'])
+                serializer = PutAuthorSerializer(data=data,instance=instance)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(status=201)
+            else:
+                print("Not admin")
+                return Response(status=404)
 
         except serializers.ValidationError as e:
             print("ValidationError:")
@@ -123,13 +143,40 @@ class AuthorsAPIView(APIView):
             if 'FOREIGN KEY constraint failed' in e.args[0]:
                return Response("user not exists", status=403)
             return Response(status=404)
+        except TokenExpired:
+            print("Token expired") # сделать нормальные логи
+            return Response(status=404)
+        except Token.DoesNotExist:
+            print("Token not exist") # сделать нормальные логи
+            return Response(status=404)
+        except Author.DoesNotExist:
+            print("Author doesn't exist")
+            return Response(status=404)
         except Exception as e:
-            print(e)
+            print(f'Something went wrong {e}')
             return Response(status=500)
     
     @swagger_auto_schema(operation_description="Delete author", responses={200: 'successfull', 'other':'something went wrong'},manual_parameters=[id_param('author id')])
     def delete(self,request):
-        author_id = request.GET.get('id')
-        author = Author.objects.get(id=author_id)
-        author.delete()
-        return Response(status=200)
+        try:
+            token_uuid = request.META.get('HTTP_TOKEN')
+            if is_admin(token_uuid):
+                author_id = request.GET.get('id')
+                author = Author.objects.get(id=author_id)
+                author.delete()
+                return Response(status=200)
+            else:
+                print("Not admin")
+                return Response(status=404)
+        except TokenExpired:
+            print("Token expired") # сделать нормальные логи
+            return Response(status=404)
+        except Token.DoesNotExist:
+            print("Token not exist") # сделать нормальные логи
+            return Response(status=404)
+        except Author.DoesNotExist:
+            print("User is not author")
+            return Response(status=404)
+        except Exception as e:
+            print(f'Something went wrong {e}')
+            return Response(status=404)

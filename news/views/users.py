@@ -1,7 +1,6 @@
 from ..models import User, Token, Author
 import json
 import django.contrib.auth.hashers as hash
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError 
 import uuid
 from .shared import *
@@ -22,6 +21,7 @@ class UsersAPIView(APIView):
             users = User.objects.all()
             serializer = UserShortInfoSerializer(users,many=True)
         except Exception as e:
+            print(f'Something went wrong {e}')
             return Response(status=500)
         else:
             return Response(serializer.data)
@@ -49,11 +49,12 @@ class UsersAPIView(APIView):
                 print(e.args)
                 return Response(status=500)
         except Exception as e:
+            print(f'Something went wrong {e}')
             return Response(status=500)
     
     def delete(self,request):
-        token_uuid = request.META.get('HTTP_TOKEN')
         try:
+            token_uuid = request.META.get('HTTP_TOKEN')
             if is_admin(token_uuid):
                 user_id = request.GET.get('id')
                 user = User.objects.get(id=user_id)
@@ -69,10 +70,11 @@ class UsersAPIView(APIView):
         except TokenExpired:
             print("Token expired") # сделать нормальные логи
             return Response(status=404)
-        except TokenNotExist:
+        except Token.DoesNotExist:
             print("Token not exist") # сделать нормальные логи
             return Response(status=404)
         except Exception as e:
+            print(f'Something went wrong {e}')
             return Response(e,status=500)
             
 
@@ -87,7 +89,7 @@ class LoginAPIView(APIView):
             username_l = data['username']
             try:
                 user = User.objects.get(username=username_l,password=password_l)
-            except ObjectDoesNotExist:
+            except User.DoesNotExist:
                 return Response("wrong username or password", status=401)
             else:
                 token = Token()
@@ -96,14 +98,13 @@ class LoginAPIView(APIView):
                 try:
                     _ = Author.objects.get(id=user.id)
                     token.author_permission=True
-                except ObjectDoesNotExist:
+                except Author.DoesNotExist:
                     pass
-                except Exception:
-                    return Response(status=500)
                 token.token = uuid.uuid4()
                 try:
                     token.save()
-                except Exception:
+                except Exception as e:
+                    print(f'Something went wrong {e}')
                     return Response(status=500)
                 else:
                     serializer_resp = TokenSerializer(token)
@@ -127,7 +128,10 @@ class ProfileAPIView(APIView):
         except TokenExpired: 
             print("Token Expired") #ЛОГИ
             return Response(status=404) # возможно стоит вернуть сообщение об истекшем токене
-        except ObjectDoesNotExist:
+        except Token.DoesNotExist:
+            print("Token not exist") # сделать нормальные логи
+            return Response(status=404)
+        except User.DoesNotExist:
             print("User not exist, but token exist")
             return Response(status=404)
         except Exception as e:

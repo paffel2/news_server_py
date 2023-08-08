@@ -11,20 +11,12 @@ class CustomSerializer(Serializer):
         return {"id":obj.id, **self._current}
     
 def is_admin(token_uuid):
-    try:
         token = Token.objects.get(token=token_uuid)
-    except ObjectDoesNotExist:
-        raise TokenNotExist()
-    else:
         return token.admin_permission and is_token_valid(token)
     
 
 def is_author(token_uuid):
-    try:
         token = Token.objects.get(token=token_uuid)
-    except ObjectDoesNotExist:
-         raise TokenNotExist()
-    else:
         return token.author_permission and is_token_valid(token) #возможно стоит сделать проверку по id новости и драфта
 
 def to_image_urls(id):

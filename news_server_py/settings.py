@@ -134,4 +134,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 SALT = '123'
 
-TOKEN_LIFE_TIME = 10 #86400
+TOKEN_LIFE_TIME = 86400
