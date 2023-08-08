@@ -80,3 +80,15 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+
+class Commentary(models.Model):
+    news_id = models.OneToOneField(News, on_delete=models.CASCADE)
+    author_id = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+    text = models.TextField()
+    created = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["news_id","created"]
+    
+    def __str__(self):
+        return self.text
