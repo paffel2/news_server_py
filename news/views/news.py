@@ -77,6 +77,10 @@ class NewsAPIView(APIView):
 class FullNewsAPIView(APIView):
 
     def get(self,_,news_id):
-        news = News.objects.get(id=news_id)
-        serializer = NewsSerializer(news)
-        return Response(serializer.data)
+        try:
+            news = News.objects.get(id=news_id)
+            serializer = NewsSerializer(news)
+            return Response(serializer.data)
+        except Exception as e:
+            print(f'Something went wrong {e}')
+            return Response(status=500)

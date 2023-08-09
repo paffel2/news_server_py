@@ -2,7 +2,7 @@
 
 POST  http://127.0.0.1:8000/api/authors/  HTTP/1.1
 content-type: application/json
-token: 2c8cb969-3994-426f-8271-3cc73950b713
+token: b75c5a1b-fe69-42d4-bd99-7d477ca23c73
 
 {
     "id": 1,

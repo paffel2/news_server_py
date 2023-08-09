@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..shared import *
-from ..serializers import ShortNewsSerializer
+from ..serializers import ShortNewsSerializer,NewsSerializer
 
 
 class DraftsAPIView(APIView):
@@ -88,6 +88,21 @@ class DraftsAPIView(APIView):
         except News.DoesNotExist:
             print("News doesn't exist")
             return Response(status=500)
+        except Exception as e:
+            print(f'Something went wrong {e}')
+            return Response(status=500)
+
+
+class FullDraftAPIView(APIView):
+
+    def get(self,_,draft_id):
+        try:
+            draft = News.objects.get(id=draft_id)
+            if not draft.is_published:
+                serializer = NewsSerializer(draft)
+                return Response(serializer.data)
+            else:
+                return Response("It is not draft", status=400) # исправить все коды ответа
         except Exception as e:
             print(f'Something went wrong {e}')
             return Response(status=500)
