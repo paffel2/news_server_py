@@ -2,6 +2,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..views.shared import *
 from django.http import FileResponse
+from ..serializers import ImageToUrlSerialzer
+
 
 
 class ImagesAPIView(APIView):
@@ -18,11 +20,8 @@ class ImagesAPIView(APIView):
     
     def get(self,_):
         images = Image.objects.all()
-        list_of_urls = []
-        for i in images:
-            image_id = i.id
-            list_of_urls.append(to_image_urls(image_id))
-        return Response(list_of_urls)
+        serializer = ImageToUrlSerialzer(images,many=True)
+        return Response(serializer.data)
 
 
 class GetImageAPIView(APIView):
