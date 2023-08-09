@@ -67,12 +67,12 @@ class News(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=250)
     created = models.DateTimeField(auto_now=True)
-    category = models.OneToOneField(Category, on_delete=models.CASCADE)
-    #main_image = models.OneToOneField(Image,on_delete=models.SET_NULL,null=True) - подумать, а надо ли оно вообще
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    #main_image = models.ForeignKey(Image,on_delete=models.SET_NULL,null=True) #подумать, а надо ли оно вообще
     tags = models.ManyToManyField(Tag)
     images = models.ManyToManyField(Image)
     text = models.TextField()
-    author = models.OneToOneField(Author,on_delete=models.SET_NULL,null=True)
+    author = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
     is_published = models.BooleanField(default=False,null=False)
 
     class Meta:
@@ -80,6 +80,17 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+    
+class MainImage(models.Model):
+    news_id = models.OneToOneField(News,on_delete=models.CASCADE)
+    image_id = models.ForeignKey(Image,on_delete=models.CASCADE)
+
+class NewsForm(forms.Form):
+    title = forms.CharField(max_length=250)
+    category = forms.ModelChoiceField(queryset=Category.objects.all())
+    tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
+    text = forms.CharField(max_length=20000)
+    #main_image = forms.ImageField()
 
 class Commentary(models.Model):
     news_id = models.OneToOneField(News, on_delete=models.CASCADE)

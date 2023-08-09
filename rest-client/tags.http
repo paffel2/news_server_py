@@ -1,6 +1,7 @@
 # @name add tags
 POST  http://127.0.0.1:8000/api/tags/  HTTP/1.1
 content-type: application/json
+token: 62d03dba-81af-47bb-8542-5fb56138a100
 
 {
     "tag_name": "cringe"
