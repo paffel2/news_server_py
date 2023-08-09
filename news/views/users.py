@@ -3,10 +3,9 @@ import json
 import django.contrib.auth.hashers as hash
 from django.db.utils import IntegrityError 
 import uuid
-from .shared import *
+from ..shared import *
 from email_validator import validate_email, EmailNotValidError
 from news_server_py.settings import SALT
-from .shared import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..serializers import *

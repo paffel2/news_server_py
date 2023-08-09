@@ -1,10 +1,9 @@
 from django.core.serializers.json import Serializer
-from ..models import *
-from django.core.exceptions import ObjectDoesNotExist
+from .models import *
 from news_server_py.settings import ALLOWED_HOSTS,ALLOWED_PORT,TOKEN_LIFE_TIME
 import datetime
 import time
-from ..exceptions import *
+from .exceptions import *
 
 class CustomSerializer(Serializer):
     def get_dump_object(self, obj):
@@ -27,7 +26,6 @@ def to_image_urls(id):
         return "error" #добавить обработку исключений
 
 def is_token_valid(token):
-        #token = Token.objects.get(token=token_uuid)
         now = time.mktime(datetime.datetime.now().timetuple())
         creation_time = time.mktime(token.creation_time.timetuple())
         delta = now - creation_time #разобраться с разницей во времени в базе данных и на сервере
@@ -40,4 +38,5 @@ def is_token_valid(token):
 def is_news_owner(token_uuid,news_id):
     token = Token.objects.get(token=token_uuid)
     news = News.objects.get(id=news_id)
-    return is_token_valid(token) and token.owner_id == news.author
+    author = Author.objects.get(id=token.owner_id)
+    return is_token_valid(token) and author == news.author

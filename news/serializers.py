@@ -129,8 +129,6 @@ class AuthorInfo(serializers.ModelSerializer):
         representation['date_joined'] = instance.id.date_joined
         return representation
 
-
-
 class ShortNewsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     title = serializers.CharField(max_length=250)
@@ -172,7 +170,7 @@ def to_image_urls(id):
 
 class NewsSerializer(serializers.ModelSerializer):
     category = FullCategoryInfoSerializer()
-    author = UserInfoSerializer() #переработать
+    author = AuthorInfo() 
     tags = TagSerializer(many=True)
     images = ImageToUrlSerialzer(many=True)
     class Meta:

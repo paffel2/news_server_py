@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..views.shared import *
+from ..shared import *
 from ..serializers import ShortNewsSerializer
 
 
@@ -11,8 +11,8 @@ class DraftsAPIView(APIView):
             token_uuid = request.META.get('HTTP_TOKEN')
             token = Token.objects.get(token=token_uuid)
             if token.author_permission and is_token_valid(token):
-                author_id = token.owner_id
-                drafts = News.objects.filter(is_published=False,author=author_id)
+                author = Author.objects.get(id=token.owner_id)
+                drafts = News.objects.filter(is_published=False,author=author)
                 serializer = ShortNewsSerializer(drafts,many=True)
                 return Response(serializer.data)
             else:
@@ -39,7 +39,7 @@ class DraftsAPIView(APIView):
                 tags = form.cleaned_data.get("tags")
                 news.title = form.cleaned_data.get("title")
                 news.text = form.cleaned_data.get("text")
-                news.author = token.owner_id
+                news.author = Author.objects.get(id=token.owner_id) 
                 images = request.FILES.getlist("images")
                 images_list = []
                 for image in images:

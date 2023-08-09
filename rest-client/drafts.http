@@ -52,6 +52,6 @@ token: e38cdfbc-0686-4604-afa6-000f19aa8e99
 # get list of drafts
 
 GET  http://127.0.0.1:8000/api/drafts/  HTTP/1.1
-token: e38cdfbc-0686-4604-afa6-000f19aa8e90
+token: e38cdfbc-0686-4604-afa6-000f19aa8e99
 
 ###

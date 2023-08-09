@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..views.shared import *
+from ..shared import *
 from django.http import FileResponse
 from ..serializers import ShortNewsSerializer,NewsSerializer
 

@@ -72,7 +72,7 @@ class News(models.Model):
     tags = models.ManyToManyField(Tag)
     images = models.ManyToManyField(Image)
     text = models.TextField()
-    author = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
+    author = models.ForeignKey(Author,on_delete=models.SET_NULL,null=True)
     is_published = models.BooleanField(default=False,null=False)
 
     class Meta:
