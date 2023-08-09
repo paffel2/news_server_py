@@ -16,8 +16,15 @@ token: e38cdfbc-0686-4604-afa6-000f19aa8e99
 
 # publish news
 
-POST  http://127.0.0.1:8000/api/news/?id=5  HTTP/1.1
+POST  http://127.0.0.1:8000/api/news/?id=7  HTTP/1.1
 content-type: application/json
 token: e38cdfbc-0686-4604-afa6-000f19aa8e99
+
+###
+
+
+# get news 
+
+GET  http://127.0.0.1:8000/api/news/7  HTTP/1.1
 
 ###

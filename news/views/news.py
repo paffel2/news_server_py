@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..views.shared import *
 from django.http import FileResponse
-from ..serializers import ShortNewsSerializer
+from ..serializers import ShortNewsSerializer,NewsSerializer
 
 
 
@@ -74,3 +74,9 @@ class NewsAPIView(APIView):
             print(f'Something went wrong {e}')
             return Response(status=500)
         
+class FullNewsAPIView(APIView):
+
+    def get(self,_,news_id):
+        news = News.objects.get(id=news_id)
+        serializer = NewsSerializer(news)
+        return Response(serializer.data)

@@ -2,6 +2,7 @@ from .models import *
 from rest_framework import serializers
 from django.db import models
 from drf_yasg import openapi
+from news_server_py.settings import ALLOWED_HOSTS,ALLOWED_PORT # вынести shared из views
 
 id_body = openapi.Schema('id',type=openapi.TYPE_INTEGER)
 def id_param(decription):
@@ -147,3 +148,34 @@ class FullCategoryInfoSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         self.fields['parent_category'] = FullCategoryInfoSerializer(read_only=True)
         return super(FullCategoryInfoSerializer, self).to_representation(instance)
+    
+
+
+class ImageIdToUrl(serializers.EmailField):   
+    def to_representation(self,data):
+        data = to_image_urls(data)
+        return data
+    
+class ImageToUrlSerialzer(serializers.ModelSerializer):
+    url = ImageIdToUrl(source='id')
+    class Meta:
+        model = Image
+        fields = ['url']
+
+
+def to_image_urls(id):
+    if ALLOWED_HOSTS != []:
+        str = f'http://{ALLOWED_HOSTS[0]}:{ALLOWED_PORT}/api/images/{id}'
+        return str
+    else:
+        return "error" #добавить обработку исключений
+
+class NewsSerializer(serializers.ModelSerializer):
+    category = FullCategoryInfoSerializer()
+    author = UserInfoSerializer() #переработать
+    tags = TagSerializer(many=True)
+    images = ImageToUrlSerialzer(many=True)
+    class Meta:
+        model = News
+        fields = '__all__'
+    
