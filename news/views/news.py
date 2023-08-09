@@ -19,16 +19,21 @@ class NewsAPIView(APIView):
                 news.text = form.cleaned_data.get("text")
                 news.author = token.owner_id
                 images = request.FILES.getlist("images")
+                images_list = []
                 for image in images:
                     if "image" in image.content_type:
-                        print(1)
+                        to_db_image=Image()
+                        to_db_image.image.save(image.name,image)
+                        images_list.append(to_db_image)
                     else:
-                        print(0)
-            
-                print(images)
+                        print("BAD IMAGE")
+                        return Response(status=410)
                 news.save()
-            #form.save()
-            #id = str(form.instance.id)
+                print("added")
+                for tag in tags:
+                    news.tags.add(tag)
+                for image in images_list:
+                    news.images.add(image)
                 return Response(str(news.id),status=200)
             else:
                 print(form.errors.as_data())

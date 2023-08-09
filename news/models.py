@@ -90,6 +90,7 @@ class NewsForm(forms.Form):
     category = forms.ModelChoiceField(queryset=Category.objects.all())
     tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
     text = forms.CharField(max_length=20000)
+    #image = models.ImageField(upload_to='images')
     #main_image = forms.ImageField()
 
 class Commentary(models.Model):

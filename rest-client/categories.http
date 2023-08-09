@@ -1,7 +1,7 @@
 # @name add category
 POST  http://127.0.0.1:8000/api/categories/  HTTP/1.1
 content-type: application/json
-token: 62d03dba-81af-47bb-8542-5fb56138a100
+token: 2c8cb969-3994-426f-8271-3cc73950b713
 
 {
     "category_name": "Football"
