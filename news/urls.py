@@ -5,6 +5,7 @@ from .views.users import UsersAPIView, LoginAPIView, ProfileAPIView
 from .views.authors import AuthorsAPIView
 from .views.images import ImagesAPIView,GetImageAPIView
 from .views.news import NewsAPIView
+from .views.drafts import DraftsAPIView
 
 urlpatterns = [
     path('categories/', CategoryAPIView.as_view()),
@@ -16,4 +17,5 @@ urlpatterns = [
     path('images/',ImagesAPIView.as_view()),
     path('images/<int:image_id>/',GetImageAPIView.as_view()),
     path('news/',NewsAPIView.as_view()),
+    path('drafts/',DraftsAPIView.as_view())
 ]

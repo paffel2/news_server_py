@@ -35,3 +35,9 @@ def is_token_valid(token):
             return True
         else:
             raise TokenExpired()
+
+
+def is_news_owner(token_uuid,news_id):
+    token = Token.objects.get(token=token_uuid)
+    news = News.objects.get(id=news_id)
+    return is_token_valid(token) and token.owner_id == news.author

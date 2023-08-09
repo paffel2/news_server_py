@@ -127,3 +127,14 @@ class AuthorInfo(serializers.ModelSerializer):
         representation['email'] = instance.id.email
         representation['date_joined'] = instance.id.date_joined
         return representation
+
+
+
+class ShortNewsSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField(max_length=250)
+    text = serializers.CharField(max_length=250)
+
+    class Meta:
+        model = News
+        fields = ['id','title','text']
