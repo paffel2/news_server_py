@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..serializers import CategorySerializer, PutCategorySerializer, id_param
+from ..serializers import CategorySerializer, PutCategorySerializer, id_param, FullCategoryInfoSerializer
 from ..views.shared import *
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import JSONParser
@@ -110,3 +110,10 @@ class CategoryAPIView(APIView):
         except Exception as e:
             print(f'Something went wrong {e}')
             return Response(status=500)
+        
+
+class FullCategoryInfoAPIView(APIView):
+    def get(self,_,category_id):
+        category = Category.objects.get(id=category_id)
+        serializer = FullCategoryInfoSerializer(category)
+        return Response(serializer.data)

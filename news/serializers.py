@@ -138,3 +138,12 @@ class ShortNewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ['id','title','text']
+
+
+class FullCategoryInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
+    def to_representation(self, instance):
+        self.fields['parent_category'] = FullCategoryInfoSerializer(read_only=True)
+        return super(FullCategoryInfoSerializer, self).to_representation(instance)
