@@ -1,8 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..shared import *
-from django.http import FileResponse
 from ..serializers import ShortNewsSerializer, NewsSerializer
+from django.core.paginator import Paginator
 
 
 class NewsAPIView(APIView):
@@ -35,10 +35,20 @@ class NewsAPIView(APIView):
             print(f"Something went wrong {e}")
             return Response(status=500)
 
-    def get(self, _):  # добавить пагинацию и фильтрацию, переработать сериализатор
+    def get(self, request):
         try:
+            page_param = request.GET.get("page")
+            if page_param != None:
+                page = int(page_param)
+            else:
+                page = 1
             news = News.objects.filter(is_published=True)
-            serializer = ShortNewsSerializer(news, many=True)
+            paginator = Paginator(news, 10)
+            if page <= paginator.num_pages:
+                page_obj = paginator.get_page(page)
+            else:
+                page_obj = []
+            serializer = ShortNewsSerializer(page_obj, many=True)
             return Response(serializer.data)
         except Exception as e:
             print(f"Something went wrong {e}")

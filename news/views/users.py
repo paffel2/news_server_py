@@ -12,6 +12,7 @@ from ..serializers import *
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import JSONParser
 from ..exceptions import *
+from django.core.paginator import Paginator
 
 
 class UsersAPIView(APIView):
@@ -19,10 +20,22 @@ class UsersAPIView(APIView):
         operation_description="Get list of users",
         responses={200: "successfull", "other": "something went wrong"},
     )
-    def get(self, _):
+    def get(self, request):
         try:
+            page_param = request.GET.get("page")
+            if page_param != None:
+                page = int(page_param)
+            else:
+                page = 1
             users = User.objects.all()
-            serializer = UserShortInfoSerializer(users, many=True)
+            paginator = Paginator(users, 10)
+            if page <= paginator.num_pages:
+                page_obj = paginator.get_page(page)
+            else:
+                page_obj = []
+            serializer = UserShortInfoSerializer(page_obj, many=True)
+        except ValueError:
+            return Response("bad page parameter", status=400)
         except Exception as e:
             print(f"Something went wrong {e}")
             return Response(status=500)

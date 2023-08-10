@@ -2,21 +2,34 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..shared import *
 from ..serializers import ShortNewsSerializer, NewsSerializer
+from django.core.paginator import Paginator
 
 
 class DraftsAPIView(APIView):
     def get(self, request):
         try:
+            page_param = request.GET.get("page")
+            if page_param != None:
+                page = int(page_param)
+            else:
+                page = 1
             token_uuid = request.META.get("HTTP_TOKEN")
             token = Token.objects.get(token=token_uuid)
             if token.author_permission and is_token_valid(token):
                 author = Author.objects.get(id=token.owner_id)
                 drafts = News.objects.filter(is_published=False, author=author)
-                serializer = ShortNewsSerializer(drafts, many=True)
+                paginator = Paginator(drafts, 10)
+                if page <= paginator.num_pages:
+                    page_obj = paginator.get_page(page)
+                else:
+                    page_obj = []
+                serializer = ShortNewsSerializer(page_obj, many=True)
                 return Response(serializer.data)
             else:
                 print("No access")
                 return Response(status=404)
+        except ValueError:
+            return Response("bad page parameter", status=400)
         except Token.DoesNotExist:
             print("Token not exist")  # сделать нормальные логи
             return Response(status=404)

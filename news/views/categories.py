@@ -11,6 +11,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import JSONParser
 from rest_framework import serializers
 from django.db.utils import IntegrityError
+from django.core.paginator import Paginator
 
 
 class CategoryAPIView(APIView):
@@ -18,11 +19,23 @@ class CategoryAPIView(APIView):
         operation_description="Get list of categories",
         responses={200: "successfull", "other": "something went wrong"},
     )
-    def get(self, _):
+    def get(self, request):
         try:
+            page_param = request.GET.get("page")
+            if page_param != None:
+                page = int(page_param)
+            else:
+                page = 1
             categories = Category.objects.all()
-            serializer = CategorySerializer(categories, many=True)
+            paginator = Paginator(categories, 10)
+            if page <= paginator.num_pages:
+                page_obj = paginator.get_page(page)
+            else:
+                page_obj = []
+            serializer = CategorySerializer(page_obj, many=True)
             return Response(serializer.data)
+        except ValueError:
+            return Response("bad page parameter", status=400)
         except Exception as e:
             print(f"Something went wrong {e}")
             return Response(status=500)
