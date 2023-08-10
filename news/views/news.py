@@ -1,11 +1,14 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import generics
 from ..shared import *
 from ..serializers import ShortNewsSerializer, NewsSerializer
-from django.core.paginator import Paginator
+from rest_framework.exceptions import NotFound
 
 
-class NewsAPIView(APIView):
+class NewsAPIView(generics.GenericAPIView):
+    pagination_class = PaginationClass
+
     def post(self, request):
         try:
             token_uuid = request.META.get("HTTP_TOKEN")
@@ -35,21 +38,14 @@ class NewsAPIView(APIView):
             print(f"Something went wrong {e}")
             return Response(status=500)
 
-    def get(self, request):
+    def get(self, _):
         try:
-            page_param = request.GET.get("page")
-            if page_param != None:
-                page = int(page_param)
-            else:
-                page = 1
             news = News.objects.filter(is_published=True)
-            paginator = Paginator(news, 10)
-            if page <= paginator.num_pages:
-                page_obj = paginator.get_page(page)
-            else:
-                page_obj = []
-            serializer = ShortNewsSerializer(page_obj, many=True)
-            return Response(serializer.data)
+            serializer = ShortNewsSerializer(news, many=True)
+            page = self.paginate_queryset(serializer.data)
+            return Response(page, status=200)
+        except NotFound as e:
+            return Response(str(e), status=404)
         except Exception as e:
             print(f"Something went wrong {e}")
             return Response(status=500)
@@ -92,3 +88,11 @@ class FullNewsAPIView(APIView):
         except Exception as e:
             print(f"Something went wrong {e}")
             return Response(status=500)
+
+
+class ListOfNewsAPIView(generics.ListAPIView):
+    queryset = News.objects.filter(is_published=True)
+    serializer_class = NewsSerializer
+    ordering_fields = ["created", "author", "category"]
+    ordering = ["created"]
+    pagination_class = PaginationClass

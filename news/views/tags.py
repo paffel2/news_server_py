@@ -1,38 +1,28 @@
 from ..models import Tag
 from ..shared import *
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from ..serializers import *
 from ..models import *
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import JSONParser
-from rest_framework import serializers
+from rest_framework import serializers, generics
 from django.db.utils import IntegrityError
-from django.core.paginator import Paginator
+from rest_framework.exceptions import NotFound
 
 
-class TagsAPIView(APIView):
+class TagsAPIView(generics.GenericAPIView):
     @swagger_auto_schema(
         operation_description="Get list of tags",
         responses={200: "successfull", "other": "something went wrong"},
     )
     def get(self, request):
         try:
-            page_param = request.GET.get("page")
-            if page_param != None:
-                page = int(page_param)
-            else:
-                page = 1
             tags = Tag.objects.all()
-            paginator = Paginator(tags, 10)
-            if page <= paginator.num_pages:
-                page_obj = paginator.get_page(page)
-            else:
-                page_obj = []
-            serializer = TagSerializer(page_obj, many=True)
-            return Response(serializer.data)
-        except ValueError:
-            return Response("bad page parameter", status=400)
+            serializer = TagSerializer(tags, many=True)
+            page = self.paginate_queryset(serializer.data)
+            return Response(page, status=200)
+        except NotFound as e:
+            return Response(str(e), status=404)
         except Exception as e:
             print(f"Something went wrong {e}")
             return Response(status=500)

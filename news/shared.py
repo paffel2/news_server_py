@@ -4,6 +4,7 @@ from news_server_py.settings import ALLOWED_HOSTS, ALLOWED_PORT, TOKEN_LIFE_TIME
 import datetime
 import time
 from .exceptions import *
+from rest_framework.pagination import PageNumberPagination
 
 
 class CustomSerializer(Serializer):
@@ -48,3 +49,7 @@ def is_news_owner(token_uuid, news_id):
     news = News.objects.get(id=news_id)
     author = Author.objects.get(id=token.owner_id)
     return is_token_valid(token) and author == news.author
+
+
+class PaginationClass(PageNumberPagination):
+    page_size = 1

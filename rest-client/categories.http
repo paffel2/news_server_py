@@ -4,7 +4,7 @@ content-type: application/json
 token: c63c58f6-074d-46c4-ae8f-53dbcbe392a0
 
 {
-    "category_name": "FootbalWater",
+    "category_name": "AAAAAAA",
     "parent_category": 1
 }
 
@@ -12,7 +12,7 @@ token: c63c58f6-074d-46c4-ae8f-53dbcbe392a0
 
 # @name get categories
 
-GET  http://127.0.0.1:8000/api/categories/  HTTP/1.1
+GET  http://127.0.0.1:8000/api/categories/?page=9  HTTP/1.1
 
 ###
 
