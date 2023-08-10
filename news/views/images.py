@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from ..shared import *
 from django.http import FileResponse
 from ..serializers import ImageToUrlSerialzer
+import os
+from news_server_py.settings import MEDIA_ROOT
 
 
 class ImagesAPIView(APIView):
@@ -20,6 +22,13 @@ class ImagesAPIView(APIView):
         images = Image.objects.all()
         serializer = ImageToUrlSerialzer(images, many=True)
         return Response(serializer.data)
+
+    def delete(self, request):
+        image_id = request.GET.get("id")
+        image = Image.objects.get(id=image_id)
+        os.remove(MEDIA_ROOT + str(image.image))
+        image.delete()
+        return Response(status=200)
 
 
 class GetImageAPIView(APIView):
