@@ -1,6 +1,9 @@
-from django.db import models
+from django.db import models, router
+from django.db.models.deletion import Collector
 from django.contrib.auth.models import AbstractUser
 from django import forms
+import os
+from news_server_py.settings import MEDIA_ROOT
 
 # Create your models here.
 
@@ -62,8 +65,17 @@ class Token(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to="images")
 
-    def __str__(self):
-        return self.image.name
+    def delete(self, using=None, keep_parents=False):
+        if self.pk is None:
+            raise ValueError(
+                "%s object can't be deleted because its %s attribute is set "
+                "to None." % (self._meta.object_name, self._meta.pk.attname)
+            )
+        using = using or router.db_for_write(self.__class__, instance=self)
+        collector = Collector(using=using, origin=self)
+        collector.collect([self], keep_parents=keep_parents)
+        os.remove(MEDIA_ROOT + str(self.image))
+        return collector.delete()
 
 
 class ImageForm(forms.ModelForm):

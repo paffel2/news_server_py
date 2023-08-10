@@ -26,7 +26,6 @@ class ImagesAPIView(APIView):
     def delete(self, request):
         image_id = request.GET.get("id")
         image = Image.objects.get(id=image_id)
-        os.remove(MEDIA_ROOT + str(image.image))
         image.delete()
         return Response(status=200)
 

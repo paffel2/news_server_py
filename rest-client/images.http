@@ -14,7 +14,7 @@ Content-Type: image/png
 ###
 
 # get image
-GET http://127.0.0.1:8000/api/images/1 HTTP/1.1
+GET http://127.0.0.1:8000/api/images/2 HTTP/1.1
 
 ###
 
