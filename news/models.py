@@ -89,9 +89,14 @@ class News(models.Model):
     title = models.CharField(max_length=250)
     created = models.DateTimeField(auto_now=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    # main_image = models.ForeignKey(Image,on_delete=models.SET_NULL,null=True) #подумать, а надо ли оно вообще
+    main_image = models.OneToOneField(
+        Image,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="main_image_article_set",
+    )  # подумать, а надо ли оно вообще
     tags = models.ManyToManyField(Tag)
-    images = models.ManyToManyField(Image)
+    images = models.ManyToManyField(Image, related_name="images_article_set")
     text = models.TextField()
     author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True)
     is_published = models.BooleanField(default=False, null=False)
@@ -106,11 +111,6 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class MainImage(models.Model):
-    news_id = models.OneToOneField(News, on_delete=models.CASCADE)
-    image_id = models.ForeignKey(Image, on_delete=models.CASCADE)
 
 
 class NewsForm(forms.Form):

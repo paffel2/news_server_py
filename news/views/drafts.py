@@ -39,6 +39,7 @@ class DraftsAPIView(APIView):
                 news.title = form.cleaned_data.get("title")
                 news.text = form.cleaned_data.get("text")
                 news.author = Author.objects.get(id=token.owner_id)
+                main_image = request.FILES.get("main_image")
                 images = request.FILES.getlist("images")
                 images_list = []
                 for image in images:
@@ -51,6 +52,10 @@ class DraftsAPIView(APIView):
                         return Response(status=410)
                 news.save()
                 print("added")
+                to_db_main_image = Image()
+                to_db_main_image.image.save(main_image.name, main_image)
+                news.main_image = to_db_main_image
+                news.save()
                 for tag in tags:
                     news.tags.add(tag)
                 for image in images_list:

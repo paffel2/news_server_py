@@ -18,7 +18,7 @@ token: e38cdfbc-0686-4604-afa6-000f19aa8e99
 
 POST  http://127.0.0.1:8000/api/news/?id=1  HTTP/1.1
 content-type: application/json
-token: ba0728c4-c4a9-4449-8c48-52c68bcef391
+token: b44db732-08a1-44ae-9895-d6355fbbdb77
 
 ###
 

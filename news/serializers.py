@@ -207,6 +207,7 @@ class NewsSerializer(serializers.ModelSerializer):
     author = AuthorInfo()
     tags = TagSerializer(many=True)
     images = ImageToUrlSerialzer(many=True)
+    main_image = ImageToUrlSerialzer()
 
     class Meta:
         model = News
