@@ -41,6 +41,11 @@ class DraftsAPIView(APIView):
                 news.author = Author.objects.get(id=token.owner_id)
                 main_image = request.FILES.get("main_image")
                 images = request.FILES.getlist("images")
+                print("added")
+                to_db_main_image = Image()
+                to_db_main_image.image.save(main_image.name, main_image)
+                news.main_image = to_db_main_image
+                news.save()
                 images_list = []
                 for image in images:
                     if "image" in image.content_type:
@@ -50,12 +55,6 @@ class DraftsAPIView(APIView):
                     else:
                         print("BAD IMAGE")
                         return Response(status=410)
-                news.save()
-                print("added")
-                to_db_main_image = Image()
-                to_db_main_image.image.save(main_image.name, main_image)
-                news.main_image = to_db_main_image
-                news.save()
                 for tag in tags:
                     news.tags.add(tag)
                 for image in images_list:
