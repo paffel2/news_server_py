@@ -171,12 +171,13 @@ class TagsInFilter(filters.BaseFilterBackend):
 class ListOfNewsAPIView(generics.ListAPIView):
     queryset = News.objects.filter(is_published=True)
     serializer_class = NewsSerializer
-    ordering_fields = ["created", "author__id__username", "category__id__category_name"]
+    ordering_fields = ["created", "author__id__username", "category__category_name"]
     ordering = ["created"]
     pagination_class = PaginationClass
     filter_backends = [
         DjangoFilterBackend,
         filters.OrderingFilter,
+        filters.SearchFilter,
         AuthorUsernameFilter,
         TitleFilter,
         TextFilter,
@@ -187,3 +188,10 @@ class ListOfNewsAPIView(generics.ListAPIView):
         TagsInFilter,
     ]
     filterset_fields = ["category", "tags"]
+    search_fields = [
+        "author__id__username",
+        "category__category_name",
+        "tags__tag_name",
+        "text",
+        "title",
+    ]
