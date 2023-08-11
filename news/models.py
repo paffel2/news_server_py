@@ -5,8 +5,6 @@ from django import forms
 import os
 from news_server_py.settings import MEDIA_ROOT
 
-# Create your models here.
-
 
 class Category(models.Model):
     id = models.AutoField(primary_key=True)

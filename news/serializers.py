@@ -5,7 +5,7 @@ from drf_yasg import openapi
 from news_server_py.settings import (
     ALLOWED_HOSTS,
     ALLOWED_PORT,
-)  # вынести shared из views
+)
 
 id_body = openapi.Schema("id", type=openapi.TYPE_INTEGER)
 

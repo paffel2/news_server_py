@@ -1,5 +1,5 @@
 from django.urls import path
-from .views.categories import CategoryAPIView  # ,# FullCategoryInfoAPIView
+from .views.categories import CategoryAPIView
 from .views.tags import TagsAPIView
 from .views.users import UsersAPIView, LoginAPIView, ProfileAPIView
 from .views.authors import AuthorsAPIView

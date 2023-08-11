@@ -5,9 +5,7 @@ from ..shared import *
 from ..serializers import ShortNewsSerializer, NewsSerializer
 from rest_framework.exceptions import NotFound
 from django_filters.rest_framework import DjangoFilterBackend
-import django_filters as df
 from datetime import datetime
-from itertools import groupby
 
 
 class NewsAPIView(generics.GenericAPIView):
@@ -95,7 +93,7 @@ class FullNewsAPIView(APIView):
 
 
 class AuthorUsernameFilter(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
+    def filter_queryset(self, request, queryset, _):
         author_name = request.GET.get("author")
         if not author_name:
             return queryset
@@ -103,7 +101,7 @@ class AuthorUsernameFilter(filters.BaseFilterBackend):
 
 
 class TitleFilter(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
+    def filter_queryset(self, request, queryset, _):
         title = request.GET.get("title")
         if not title:
             return queryset
@@ -111,7 +109,7 @@ class TitleFilter(filters.BaseFilterBackend):
 
 
 class TextFilter(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
+    def filter_queryset(self, request, queryset, _):
         text = request.GET.get("text")
         if not text:
             return queryset
@@ -119,7 +117,7 @@ class TextFilter(filters.BaseFilterBackend):
 
 
 class DateFilter(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
+    def filter_queryset(self, request, queryset, _):
         created_str = request.GET.get("created")
         if not created_str:
             return queryset
@@ -128,7 +126,7 @@ class DateFilter(filters.BaseFilterBackend):
 
 
 class DateBeforeFilter(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
+    def filter_queryset(self, request, queryset, _):
         created_lt_str = request.GET.get("created_lt")
         if not created_lt_str:
             return queryset
@@ -137,7 +135,7 @@ class DateBeforeFilter(filters.BaseFilterBackend):
 
 
 class DateAfterFilter(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
+    def filter_queryset(self, request, queryset, _):
         created_gt_str = request.GET.get("created_gt")
         if not created_gt_str:
             return queryset
@@ -146,7 +144,7 @@ class DateAfterFilter(filters.BaseFilterBackend):
 
 
 class TagsAllFilter(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
+    def filter_queryset(self, request, queryset, _):
         tag_all_str = request.GET.get("tags_all")
         if not tag_all_str:
             return queryset
@@ -158,7 +156,7 @@ class TagsAllFilter(filters.BaseFilterBackend):
 
 
 class TagsInFilter(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
+    def filter_queryset(self, request, queryset, _):
         tag_in_str = request.GET.get("tags_in")
         if not tag_in_str:
             return queryset

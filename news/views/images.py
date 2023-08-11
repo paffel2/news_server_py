@@ -3,8 +3,6 @@ from rest_framework.views import APIView
 from ..shared import *
 from django.http import FileResponse
 from ..serializers import ImageToUrlSerialzer
-import os
-from news_server_py.settings import MEDIA_ROOT
 
 
 class ImagesAPIView(APIView):
