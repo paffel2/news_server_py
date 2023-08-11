@@ -94,7 +94,7 @@ class News(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         related_name="main_image_article_set",
-    )  # подумать, а надо ли оно вообще
+    )
     tags = models.ManyToManyField(Tag)
     images = models.ManyToManyField(Image, related_name="images_article_set")
     text = models.TextField()
@@ -118,8 +118,6 @@ class NewsForm(forms.Form):
     category = forms.ModelChoiceField(queryset=Category.objects.all())
     tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
     text = forms.CharField(max_length=20000)
-    # image = models.ImageField(upload_to='images')
-    # main_image = forms.ImageField()
 
 
 class Commentary(models.Model):

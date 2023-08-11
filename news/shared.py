@@ -5,6 +5,7 @@ import datetime
 import time
 from .exceptions import *
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 
 class CustomSerializer(Serializer):
@@ -52,4 +53,16 @@ def is_news_owner(token_uuid, news_id):
 
 
 class PaginationClass(PageNumberPagination):
-    page_size = 1
+    page_size = 10
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+
+def from_str_to_list_of_ints(string):
+    if len(string) < 3:
+        raise Exception()
+    else:
+        string_without_brackets = string[1:-1]
+        list_of_ints = [int(x) for x in string_without_brackets.split(",")]
+        return list_of_ints
