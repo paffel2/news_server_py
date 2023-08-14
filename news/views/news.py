@@ -59,6 +59,9 @@ class NewsAPIView(generics.GenericAPIView):
             if is_admin(token_uuid) or is_news_owner(token_uuid, news_id):
                 news = News.objects.get(id=news_id)
                 if news.is_published:
+                    for image in news.images.all():
+                        image.delete()
+                    news.main_image.delete()
                     news.delete()
                     return Response(status=200)
                 else:

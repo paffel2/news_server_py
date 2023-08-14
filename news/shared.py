@@ -48,10 +48,13 @@ def is_token_valid(token):
 
 
 def is_news_owner(token_uuid, news_id):
-    token = Token.objects.get(token=token_uuid)
-    news = News.objects.get(id=news_id)
-    author = Author.objects.get(id=token.owner_id)
-    return is_token_valid(token) and author == news.author
+    try:
+        token = Token.objects.get(token=token_uuid)
+        news = News.objects.get(id=news_id)
+        author = Author.objects.get(id=token.owner_id)
+        return is_token_valid(token) and author == news.author
+    except Author.DoesNotExist:
+        return False
 
 
 class PaginationClass(PageNumberPagination):

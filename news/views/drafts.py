@@ -13,7 +13,7 @@ class DraftsAPIView(generics.GenericAPIView):
         try:
             token_uuid = request.META.get("HTTP_TOKEN")
             token = Token.objects.get(token=token_uuid)
-            if token.author_permission and is_token_valid(token):
+            if is_author(token_uuid):
                 author = Author.objects.get(id=token.owner_id)
                 drafts = News.objects.filter(is_published=False, author=author)
                 serializer = ShortNewsSerializer(drafts, many=True)
@@ -81,6 +81,9 @@ class DraftsAPIView(generics.GenericAPIView):
             if is_admin(token_uuid) or is_news_owner(token_uuid, draft_id):
                 draft = News.objects.get(id=draft_id)
                 if not draft.is_published:
+                    for image in draft.images.all():
+                        image.delete()
+                    draft.main_image.delete()
                     draft.delete()
                     return Response(status=200)
                 else:
