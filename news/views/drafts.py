@@ -105,6 +105,49 @@ class DraftsAPIView(generics.GenericAPIView):
             print(f"Something went wrong {e}")
             return Response(status=500)
 
+    def put(self, request):
+        token_uuid = request.META.get("HTTP_TOKEN")
+        form = DraftUpdateForm(request.POST, request.FILES)
+        if form.is_valid():
+            draft_id = form.cleaned_data.get("id")
+            if is_news_owner(token_uuid, draft_id):
+                news = News.objects.get(id=draft_id)
+                news.category = form.cleaned_data.get("category")
+                tags = form.cleaned_data.get("tags")
+                news.title = form.cleaned_data.get("title")
+                news.text = form.cleaned_data.get("text")
+                for image in news.images.all():
+                    image.delete()
+                news.main_image.delete()
+                main_image = request.FILES.get("main_image")
+                images = request.FILES.getlist("images")
+                print("added")
+                to_db_main_image = Image()
+                to_db_main_image.image.save(main_image.name, main_image)
+                news.main_image = to_db_main_image
+                print(news.id)
+                news.save()
+                images_list = []
+                for image in images:
+                    if "image" in image.content_type:
+                        to_db_image = Image()
+                        to_db_image.image.save(image.name, image)
+                        images_list.append(to_db_image)
+                    else:
+                        print("BAD IMAGE")
+                        return Response(status=410)
+                for tag in tags:
+                    news.tags.add(tag)
+                for image in images_list:
+                    news.images.add(image)
+                return Response(f"draft_id: {news.id}", status=200)
+            else:
+                print("not author")
+                return Response(status=404)
+        else:
+            print(form.errors.as_data())
+            return Response(status=404)
+
 
 class FullDraftAPIView(APIView):
     def get(self, _, draft_id):

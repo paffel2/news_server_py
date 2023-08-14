@@ -116,6 +116,10 @@ class NewsForm(forms.Form):
     text = forms.CharField(max_length=20000)
 
 
+class DraftUpdateForm(NewsForm):
+    id = forms.IntegerField()
+
+
 class Commentary(models.Model):
     news_id = models.ForeignKey(News, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
