@@ -15,14 +15,16 @@ class CustomSerializer(Serializer):
 
 def is_admin(token_uuid):
     token = Token.objects.get(token=token_uuid)
-    return token.admin_permission and is_token_valid(token)
+    return token.owner_id.is_staff and is_token_valid(token)
 
 
 def is_author(token_uuid):
-    token = Token.objects.get(token=token_uuid)
-    return token.author_permission and is_token_valid(
-        token
-    )  # возможно стоит сделать проверку по id новости и драфта
+    try:
+        token = Token.objects.get(token=token_uuid)
+        _ = Author.objects.get(id=token.owner_id)
+        return is_token_valid(token)
+    except Author.DoesNotExist:
+        return False
 
 
 def to_image_urls(id):
