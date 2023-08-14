@@ -212,3 +212,23 @@ class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = "__all__"
+
+
+class PostCommentarySeriallizer(serializers.ModelSerializer):
+    # news_id = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Commentary
+        fields = "__all__"
+
+    # def add_news_id(self,news_id):
+
+
+class CommentarySerializer(serializers.ModelSerializer):
+    author = UserShortInfoSerializer()
+    created = serializers.DateTimeField()
+    text = serializers.CharField(max_length=2500)
+
+    class Meta:
+        model = Commentary
+        fields = "__all__"

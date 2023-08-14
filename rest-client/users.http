@@ -1,27 +1,27 @@
 ###
 
-# @name registration
+# registration
 
 POST  http://127.0.0.1:8000/api/users/  HTTP/1.1
 content-type: application/json
 
 {
-    "first_name": "first_name1",
-    "last_name": "last_name1",
-    "username": "username1",
+    "first_name": "first_name",
+    "last_name": "last_name",
+    "username": "username",
     "password": "password",
     "email": "email@email.com"
 }
 
 ###
 
-# @name users list
+#  users list
 
 GET  http://127.0.0.1:8000/api/users/  HTTP/1.1
 
 ###
 
-# @name delete user
+#  delete user
 
 DELETE  http://127.0.0.1:8000/api/users/?id=1  HTTP/1.1
 content-type: application/json
@@ -29,7 +29,7 @@ token: a3341de7-b3bf-4b18-9dce-ab1c922389e0
 
 ###
 
-# @name login
+#  login
 
 POST  http://127.0.0.1:8000/api/login/  HTTP/1.1
 content-type: application/json
@@ -41,7 +41,7 @@ content-type: application/json
 
 ###
 
-# @name profile info
+#  profile info
 
 GET  http://127.0.0.1:8000/api/profile/  HTTP/1.1
 content-type: application/json
@@ -49,7 +49,7 @@ token: 45922674-a269-43c6-bcbe-362fec3cce3c
 
 ###
 
-# @name check token
+#  check token
 
 GET  http://127.0.0.1:8000/user/check_token  HTTP/1.1
 token: a51cecd6-710a-4a05-be6f-c42841b4a279

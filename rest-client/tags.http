@@ -1,21 +1,21 @@
-# @name add tags
+#  add tags
 POST  http://127.0.0.1:8000/api/tags/  HTTP/1.1
 content-type: application/json
-token: 747a3009-32e8-49e0-9998-9dcc0f44accd
+token: 9772a0c6-29d6-4903-a392-82a50074df7f
 
 {
-    "tag_name": "aaaaaaa"
+    "tag_name": "cccc"
 }
 
 ###
 
-# @name get tags
+#  get tags
 
 GET  http://127.0.0.1:8000/api/tags/  HTTP/1.1
 
 ###
 
-# @name update tag
+#  update tag
 
 PUT  http://127.0.0.1:8000/api/tags/  HTTP/1.1
 content-type: application/json
@@ -27,7 +27,7 @@ content-type: application/json
 
 ###
 
-# @name delete tag
+#  delete tag
 
 DELETE  http://127.0.0.1:8000/api/tags/?id=2  HTTP/1.1
 content-type: application/json

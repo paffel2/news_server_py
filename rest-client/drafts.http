@@ -5,12 +5,12 @@
 POST /api/drafts/ HTTP/1.1
 Host: localhost:8000
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-token: 747a3009-32e8-49e0-9998-9dcc0f44accd
+token: 9772a0c6-29d6-4903-a392-82a50074df7f
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="title"
 
-news_title2
+news_title1
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="category"
 

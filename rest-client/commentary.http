@@ -1,0 +1,20 @@
+
+# post commentaries
+POST  http://127.0.0.1:8000/api/news/1/commentaries/
+token: 9772a0c6-29d6-4903-a392-82a50074df7f
+
+{
+    "text": "another comment"
+}
+
+###
+
+# get commentaries
+GET  http://127.0.0.1:8000/api/news/1/commentaries/
+#token: 9772a0c6-29d6-4903-a392-82a50074df7f
+
+###
+
+# delete commentary
+DELETE  http://127.0.0.1:8000/api/news/1/commentaries/?id=1
+token: 9772a0c6-29d6-4903-a392-82a50074df7f

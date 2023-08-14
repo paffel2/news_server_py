@@ -117,8 +117,8 @@ class NewsForm(forms.Form):
 
 
 class Commentary(models.Model):
-    news_id = models.OneToOneField(News, on_delete=models.CASCADE)
-    author_id = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+    news_id = models.ForeignKey(News, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     text = models.TextField()
     created = models.DateTimeField(auto_now=True)
 

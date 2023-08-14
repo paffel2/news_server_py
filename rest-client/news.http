@@ -16,21 +16,21 @@ token: e38cdfbc-0686-4604-afa6-000f19aa8e99
 
 # publish news
 
-POST  http://127.0.0.1:8000/api/news/?id=4  HTTP/1.1
+POST  http://127.0.0.1:8000/api/news/?id=2  HTTP/1.1
 content-type: application/json
-token: 747a3009-32e8-49e0-9998-9dcc0f44accd
+token: 9772a0c6-29d6-4903-a392-82a50074df7f
 
 ###
 
 
 # get news 
 
-GET  http://127.0.0.1:8000/api/news/4  HTTP/1.1
+GET  http://127.0.0.1:8000/api/news/1  HTTP/1.1
 
 ###
 
 # get news 
 
-GET  http://127.0.0.1:8000/api/list_of_news/?tags_in=[1,2,3] HTTP/1.1
+GET  http://127.0.0.1:8000/api/list_of_news/ HTTP/1.1
 
 ###

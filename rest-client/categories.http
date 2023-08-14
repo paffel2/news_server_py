@@ -1,22 +1,22 @@
-# @name add category
+#  add category
 POST  http://127.0.0.1:8000/api/categories/  HTTP/1.1
 content-type: application/json
-token: c63c58f6-074d-46c4-ae8f-53dbcbe392a0
+token: 9772a0c6-29d6-4903-a392-82a50074df7f
 
 {
-    "category_name": "AAAAAAA",
+    "category_name": "Football",
     "parent_category": 1
 }
 
 ###
 
-# @name get categories
+#  get categories
 
 GET  http://127.0.0.1:8000/api/categories/?page=9  HTTP/1.1
 
 ###
 
-# @name update categories
+#  update categories
 
 PUT  http://127.0.0.1:8000/api/categories/  HTTP/1.1
 content-type: application/json
@@ -29,14 +29,14 @@ token: 2d13ee53-d1a1-40fe-b1a3-5e2f36cad9e7
 
 ###
 
-# @name delete categories
+#  delete categories
 
 DELETE  http://127.0.0.1:8000/api/categories/?id=4  HTTP/1.1
 content-type: application/json
 token: 2d13ee53-d1a1-40fe-b1a3-5e2f36cad9e7
 ###
 
-# @name get categories
+#  get categories
 
 GET  http://127.0.0.1:8000/api/categories/search=title&title_only=title_only  HTTP/1.1
 
