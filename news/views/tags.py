@@ -13,6 +13,9 @@ from rest_framework.exceptions import NotFound
 class TagsAPIView(generics.GenericAPIView):
     pagination_class = PaginationClass
 
+    def get_queryset(self):
+        return Tag.objects.all()
+
     @swagger_auto_schema(
         operation_description="Get list of tags",
         responses={200: "successfull", "other": "something went wrong"},

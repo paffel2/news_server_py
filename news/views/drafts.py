@@ -1,13 +1,18 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..shared import *
-from ..serializers import ShortNewsSerializer, NewsSerializer
+from ..serializers import NewsSerializer
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
 
 
 class DraftsAPIView(generics.GenericAPIView):
     pagination_class = PaginationClass
+
+    serializer_class = NewsSerializer
+
+    def get_queryset(self):
+        return News.objects.none()
 
     def get(self, request):
         try:
@@ -16,7 +21,7 @@ class DraftsAPIView(generics.GenericAPIView):
             if is_author(token_uuid):
                 author = Author.objects.get(id=token.owner_id)
                 drafts = News.objects.filter(is_published=False, author=author)
-                serializer = ShortNewsSerializer(drafts, many=True)
+                serializer = NewsSerializer(drafts, many=True)
                 page = self.paginate_queryset(serializer.data)
                 return Response(page, status=200)
             else:

@@ -4,7 +4,7 @@ from .views.tags import TagsAPIView
 from .views.users import UsersAPIView, LoginAPIView, ProfileAPIView
 from .views.authors import AuthorsAPIView
 from .views.images import ImagesAPIView, GetImageAPIView
-from .views.news import NewsAPIView, FullNewsAPIView, ListOfNewsAPIView
+from .views.news import NewsAPIView, FullNewsAPIView
 from .views.drafts import DraftsAPIView, FullDraftAPIView
 from .views.commentaries import CommentsAPIView
 
@@ -21,6 +21,5 @@ urlpatterns = [
     path("news/<int:news_id>/", FullNewsAPIView.as_view()),
     path("drafts/", DraftsAPIView.as_view()),
     path("drafts/<int:draft_id>/", FullDraftAPIView.as_view()),
-    path("list_of_news/", ListOfNewsAPIView.as_view()),
     path("news/<int:news_id>/commentaries/", CommentsAPIView.as_view()),
 ]

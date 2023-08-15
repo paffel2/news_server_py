@@ -19,6 +19,9 @@ from rest_framework import generics
 class UsersAPIView(generics.GenericAPIView):
     pagination_class = PaginationClass
 
+    def get_queryset(self):
+        return User.objects.all()
+
     @swagger_auto_schema(
         operation_description="Get list of users",
         responses={200: "successfull", "other": "something went wrong"},
@@ -35,8 +38,6 @@ class UsersAPIView(generics.GenericAPIView):
         except Exception as e:
             print(f"Something went wrong {e}")
             return Response(status=500)
-        else:
-            return Response(serializer.data)
 
     @swagger_auto_schema(
         operation_description="Registration",
@@ -161,31 +162,3 @@ class ProfileAPIView(APIView):
         except Exception as e:
             print(f"Something wrong {e}")
             return Response(status=404)
-
-
-"""
-
-def check_token(request): #тестовый эндпоинт, будет удален, а функционал добавлен, где требуется проверка токена
-    token_uuid = request.META.get('HTTP_TOKEN')
-    result = is_token_valid(token_uuid)
-    return HttpResponse(result) 
-"""
-
-"""
-            body = json.loads(request.body.decode("utf-8"))
-            user = User()
-            user.first_name = body['first_name']
-            user.last_name = body['last_name']
-            email_info = validate_email(body['email'],check_deliverability=False)
-            email = email_info.normalized
-            user.email = email
-            user.username = body['username']
-            user.password = hash.make_password(body['password'],salt=SALT)
-            try:
-                user.save()
-            except ValueError as e:
-            #добавить логи
-                return Response(status=403)
-            else:
-                return Response(status=201)
-"""
