@@ -1,4 +1,3 @@
-#FROM python:latest
 FROM python:3.10.12
 
 SHELL ["/bin/bash", "-c"]
