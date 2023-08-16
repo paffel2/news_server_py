@@ -18,7 +18,7 @@ class TagsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Get list of tags",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
     )
     def get(self, request):
         try:
@@ -34,7 +34,7 @@ class TagsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Create tag",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
         request_body=PutTagSerializer,
     )
     def post(self, request):
@@ -71,7 +71,7 @@ class TagsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Update tag",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
         request_body=TagSerializer,
     )
     def put(self, request):
@@ -107,7 +107,7 @@ class TagsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Delete tag",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
         manual_parameters=[id_param("tag id")],
     )
     def delete(self, request):

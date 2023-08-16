@@ -1,9 +1,10 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..shared import *
-from ..serializers import NewsSerializer
+from ..serializers import NewsSerializer, id_param
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
+from drf_yasg.utils import swagger_auto_schema
 
 
 class DraftsAPIView(generics.GenericAPIView):
@@ -14,6 +15,9 @@ class DraftsAPIView(generics.GenericAPIView):
     def get_queryset(self):
         return News.objects.none()
 
+    @swagger_auto_schema(
+        operation_description="Get list of drafts",
+    )
     def get(self, request):
         try:
             token_uuid = request.META.get("HTTP_TOKEN")
@@ -39,6 +43,11 @@ class DraftsAPIView(generics.GenericAPIView):
             print(f"Something went wrong {e}")
             return Response(status=500)
 
+    @swagger_auto_schema(
+        operation_description="Add draft",
+        request_body=None,
+        responses={201: "draft_id: integer", "other": "something went wrong"},
+    )  # узнать как добавить в сваггер пример формы
     def post(self, request):
         token_uuid = request.META.get("HTTP_TOKEN")
         if is_author(token_uuid):
@@ -79,6 +88,11 @@ class DraftsAPIView(generics.GenericAPIView):
             print("not author")
             return Response(status=404)
 
+    @swagger_auto_schema(
+        operation_description="Delete draft",
+        responses={200: "successful", "other": "something went wrong"},
+        manual_parameters=[id_param("category id")],
+    )
     def delete(self, request):
         try:
             token_uuid = request.META.get("HTTP_TOKEN")
@@ -110,6 +124,11 @@ class DraftsAPIView(generics.GenericAPIView):
             print(f"Something went wrong {e}")
             return Response(status=500)
 
+    @swagger_auto_schema(
+        operation_description="Update draft",
+        request_body=None,
+        responses={201: "draft_id: integer", "other": "something went wrong"},
+    )  # узнать как добавить в сваггер пример формы
     def put(self, request):
         token_uuid = request.META.get("HTTP_TOKEN")
         form = DraftUpdateForm(request.POST, request.FILES)

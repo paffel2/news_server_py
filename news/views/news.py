@@ -2,10 +2,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, filters, mixins
 from ..shared import *
-from ..serializers import ShortNewsSerializer, NewsSerializer
+from ..serializers import ShortNewsSerializer, NewsSerializer, id_param
 from rest_framework.exceptions import NotFound
 from django_filters.rest_framework import DjangoFilterBackend
 from datetime import datetime
+from drf_yasg.utils import swagger_auto_schema
 
 
 class AuthorUsernameFilter(filters.BaseFilterBackend):
@@ -113,6 +114,11 @@ class NewsAPIView(mixins.ListModelMixin, generics.GenericAPIView):
     def get_queryset(self):
         return News.objects.none()
 
+    @swagger_auto_schema(
+        operation_description="Publish news",
+        request_body=None,  # разобраться почему сваггер решил, что тело запроса присутствует
+        manual_parameters=[id_param("id")],
+    )
     def post(self, request):
         try:
             token_uuid = request.META.get("HTTP_TOKEN")
@@ -142,9 +148,17 @@ class NewsAPIView(mixins.ListModelMixin, generics.GenericAPIView):
             print(f"Something went wrong {e}")
             return Response(status=500)
 
+    @swagger_auto_schema(
+        operation_description="Get list of news",
+    )
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
+    @swagger_auto_schema(
+        operation_description="Delete news",
+        manual_parameters=[id_param("id")],
+        responses={200: "successful", "other": "something went wrong"},
+    )
     def delete(self, request):
         try:
             token_uuid = request.META.get("HTTP_TOKEN")
@@ -161,7 +175,7 @@ class NewsAPIView(mixins.ListModelMixin, generics.GenericAPIView):
                     print("trying to delete draft")
                     return Response("it is draft", status=400)
             else:
-                print("No acess")
+                print("No access")
                 return Response(status=404)
         except TokenExpired:
             print("Token expired")  # сделать нормальные логи
@@ -178,6 +192,9 @@ class NewsAPIView(mixins.ListModelMixin, generics.GenericAPIView):
 
 
 class FullNewsAPIView(APIView):
+    @swagger_auto_schema(
+        operation_description="Get news by id",
+    )
     def get(self, _, news_id):
         try:
             news = News.objects.get(id=news_id)

@@ -10,14 +10,14 @@ from news_server_py.settings import (
 id_body = openapi.Schema("id", type=openapi.TYPE_INTEGER)
 
 
-def id_param(decription):
+def id_param(description):
     return openapi.Parameter(
-        "id", openapi.IN_QUERY, description=decription, type=openapi.TYPE_INTEGER
+        "id", openapi.IN_QUERY, description=description, type=openapi.TYPE_INTEGER
     )
 
 
 token_param = openapi.Parameter(
-    "token", openapi.IN_HEADER, description="accesing token", type=openapi.TYPE_STRING
+    "token", openapi.IN_HEADER, description="accessing token", type=openapi.TYPE_STRING
 )
 
 
@@ -186,7 +186,7 @@ class ImageIdToUrl(serializers.EmailField):
         return data
 
 
-class ImageToUrlSerialzer(serializers.ModelSerializer):
+class ImageToUrlSerializer(serializers.ModelSerializer):
     url = ImageIdToUrl(source="id")
 
     class Meta:
@@ -206,22 +206,24 @@ class NewsSerializer(serializers.ModelSerializer):
     category = FullCategoryInfoSerializer()
     author = AuthorInfo()
     tags = TagSerializer(many=True)
-    images = ImageToUrlSerialzer(many=True)
-    main_image = ImageToUrlSerialzer()
+    images = ImageToUrlSerializer(many=True)
+    main_image = ImageToUrlSerializer()
 
     class Meta:
         model = News
         fields = "__all__"
 
 
-class PostCommentarySeriallizer(serializers.ModelSerializer):
-    # news_id = serializers.SerializerMethodField()
+class TextCommentarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Commentary
+        fields = ["text"]
 
+
+class PostCommentarySerializer(TextCommentarySerializer):
     class Meta:
         model = Commentary
         fields = "__all__"
-
-    # def add_news_id(self,news_id):
 
 
 class CommentarySerializer(serializers.ModelSerializer):
@@ -231,4 +233,4 @@ class CommentarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Commentary
-        fields = "__all__"
+        fields = ["author", "created", "text"]

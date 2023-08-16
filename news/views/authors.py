@@ -1,5 +1,4 @@
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from ..serializers import PutAuthorSerializer, AuthorInfo, id_param
 from ..shared import *
 from drf_yasg.utils import swagger_auto_schema
@@ -17,7 +16,7 @@ class AuthorsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Get list of authors",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: AuthorInfo, "other": "something went wrong"},
     )
     def get(self, _):
         try:
@@ -33,7 +32,7 @@ class AuthorsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Create author",
-        responses={201: "successfull", "other": "something went wrong"},
+        responses={201: "successful", "other": "something went wrong"},
         request_body=PutAuthorSerializer,
     )
     def post(self, request):
@@ -67,7 +66,7 @@ class AuthorsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Update author",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
         request_body=PutAuthorSerializer,
     )
     def put(self, request):
@@ -109,7 +108,7 @@ class AuthorsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Delete author",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
         manual_parameters=[id_param("author id")],
     )
     def delete(self, request):

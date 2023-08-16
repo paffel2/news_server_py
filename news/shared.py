@@ -63,6 +63,9 @@ class PaginationClass(PageNumberPagination):
     def get_paginated_response(self, data):
         return Response(data)
 
+    def get_paginated_response_schema(self, schema):
+        return schema
+
 
 def from_str_to_list_of_ints(string):
     if len(string) < 3:

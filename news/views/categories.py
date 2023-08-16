@@ -22,7 +22,7 @@ class CategoryAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Get list of categories",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: CategorySerializer, "other": "something went wrong"},
     )
     def get(self, _):
         try:
@@ -38,7 +38,7 @@ class CategoryAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Create category",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "category_id: integer", "other": "something went wrong"},
         request_body=PutCategorySerializer,
     )
     def post(self, request):
@@ -77,7 +77,7 @@ class CategoryAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Update category",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
         request_body=CategorySerializer,
     )
     def put(self, request):
@@ -113,7 +113,7 @@ class CategoryAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Delete category",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
         manual_parameters=[id_param("category id")],
     )
     def delete(self, request):

@@ -24,7 +24,7 @@ class UsersAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Get list of users",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
     )
     def get(self, _):
         try:
@@ -41,7 +41,7 @@ class UsersAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Registration",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
         request_body=UserRegistrationSerializer,
     )
     def post(self, request):
@@ -57,7 +57,7 @@ class UsersAPIView(generics.GenericAPIView):
             else:
                 return Response("bad json format", status=403)
         except EmailNotValidError:
-            return Response("bad email addres", status=403)
+            return Response("bad email address", status=403)
         except KeyError as e:
             return Response(f"not found field {e}", status=403)
         except IntegrityError as e:
@@ -99,7 +99,7 @@ class UsersAPIView(generics.GenericAPIView):
 class LoginAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Login",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
         request_body=UserLoginSerializer,
     )
     def post(self, request):
@@ -135,7 +135,7 @@ class LoginAPIView(APIView):
 class ProfileAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get profile info",
-        responses={200: "successfull", "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
         manual_parameters=[token_param],
     )
     def get(self, request):
