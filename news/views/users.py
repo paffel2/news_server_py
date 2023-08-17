@@ -1,10 +1,8 @@
 from ..models import User, Token, Author
-import json
 import django.contrib.auth.hashers as hash
 from django.db.utils import IntegrityError
 import uuid
 from ..shared import *
-from email_validator import validate_email, EmailNotValidError
 from news_server_py.settings import SALT
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,6 +12,7 @@ from rest_framework.parsers import JSONParser
 from ..exceptions import *
 from rest_framework.exceptions import NotFound
 from rest_framework import generics
+import logging as log
 
 
 class UsersAPIView(generics.GenericAPIView):
@@ -28,16 +27,22 @@ class UsersAPIView(generics.GenericAPIView):
     )
     def get(self, _):
         try:
+            log.info("Getting list of users endpoint")
+            log.debug("Getting list of users from database")
             users = User.objects.all()
+            log.debug("Serializing")
             serializer = UserShortInfoSerializer(users, many=True)
+            log.debug("Applying pagination")
             page = self.paginate_queryset(serializer.data)
+            log.debug("Sending list of users")
             return Response(page, status=200)
 
         except NotFound as e:
+            log.error(f"NotFound error {e}")
             return Response(str(e), status=404)
         except Exception as e:
-            print(f"Something went wrong {e}")
-            return Response(status=500)
+            log.error(f"Something went wrong {e}")
+            return Response(status=404)
 
     @swagger_auto_schema(
         operation_description="Registration",
@@ -46,54 +51,66 @@ class UsersAPIView(generics.GenericAPIView):
     )
     def post(self, request):
         try:
+            log.info("Registration endpoint")
+            log.debug("Getting request body")  # добавить аватар
             data = JSONParser().parse(request)
+            log.debug("Serializing")
             serializer_req = UserRegistrationSerializer(data=data)
-            if serializer_req.is_valid():
-                _ = validate_email(data["email"], check_deliverability=False)
-                serializer_req.save(
-                    password=hash.make_password(data["password"], salt=SALT)
-                )
-                return Response(status=201)
-            else:
-                return Response("bad json format", status=403)
-        except EmailNotValidError:
-            return Response("bad email address", status=403)
+            log.debug("Validation")
+            serializer_req.is_valid(raise_exception=True)
+            log.debug("Saving user")
+            serializer_req.save(
+                password=hash.make_password(data["password"], salt=SALT)
+            )
+            return Response(status=201)
+        except serializers.ValidationError as e:
+            log.error(f"ValidationError: {e}")
+            return Response("bad json format", status=500)
         except KeyError as e:
-            return Response(f"not found field {e}", status=403)
+            log.error(f"KeyError: {e}")
+            return Response(f"not found field {e}", status=500)
         except IntegrityError as e:
             if "UNIQUE constraint failed: news_user.username" in e.args[0]:
-                return Response("username already exists", status=403)
+                log.error("Username already exist")
+                return Response("username already exists", status=500)
             else:
-                print(e.args)
+                log.error(f"IntegrityError: {e.args}")
                 return Response(status=500)
         except Exception as e:
-            print(f"Something went wrong {e}")
-            return Response(status=500)
+            log.error(f"Something went wrong {e}")
+            return Response(status=404)
 
+    @swagger_auto_schema(
+        operation_description="Deleting user",
+        responses={200: "successful", "other": "something went wrong"},
+        manual_parameters=[id_param("user_id"), token_param],
+    )
     def delete(self, request):
         try:
+            log.info("Deleting user endpoint")
+            log.debug("Reading token from header")
             token_uuid = request.META.get("HTTP_TOKEN")
+            log.debug("Checking token")
             if is_admin(token_uuid):
+                log.debug("Getting users's id from params")
                 user_id = request.GET.get("id")
+                log.debug("Getting users from database")
                 user = User.objects.get(id=user_id)
+                log.debug("Deleting user")
                 user.delete()
                 return Response(status=200)
             else:
-                print("Is not admin")
+                log.error("Is not admin")
                 return Response(status=404)
-        except json.JSONDecodeError:
-            return Response("bad json format", status=403)
-        except KeyError as e:
-            return Response(f"not found field {e}", status=403)
         except TokenExpired:
-            print("Token expired")  # сделать нормальные логи
-            return Response(status=404)
+            log.error("Token expired")
+            return Response("Token expired", status=403)
         except Token.DoesNotExist:
-            print("Token not exist")  # сделать нормальные логи
+            log.error("Token not exist")
             return Response(status=404)
         except Exception as e:
-            print(f"Something went wrong {e}")
-            return Response(e, status=500)
+            log.error(f"Something went wrong {e}")
+            return Response(e, status=404)
 
 
 class LoginAPIView(APIView):
@@ -103,33 +120,42 @@ class LoginAPIView(APIView):
         request_body=UserLoginSerializer,
     )
     def post(self, request):
-        data = JSONParser().parse(request)
-        serializer_req = UserLoginSerializer(data=data)
-        if serializer_req.is_valid():
+        try:
+            log.info("Login endpoint")
+            log.debug("Getting request body")
+            data = JSONParser().parse(request)
+            log.debug("Serializing")
+            serializer_req = UserLoginSerializer(data=data)
+            log.debug("Validation")
+            serializer_req.is_valid(raise_exception=True)
+            log.debug("Getting username and password hash")
             password_l = hash.make_password(data["password"], salt=SALT)
             username_l = data["username"]
+            log.debug("Getting user")
+            user = User.objects.get(username=username_l, password=password_l)
+            log.debug("Generating token")
+            token = Token()
+            token.owner_id = user
+            token.admin_permission = user.is_staff
             try:
-                user = User.objects.get(username=username_l, password=password_l)
-            except User.DoesNotExist:
-                return Response("wrong username or password", status=401)
-            else:
-                token = Token()
-                token.owner_id = user
-                token.admin_permission = user.is_staff
-                try:
-                    _ = Author.objects.get(id=user.id)
-                    token.author_permission = True
-                except Author.DoesNotExist:
-                    pass
-                token.token = uuid.uuid4()
-                try:
-                    token.save()
-                except Exception as e:
-                    print(f"Something went wrong {e}")
-                    return Response(status=500)
-                else:
-                    serializer_resp = TokenSerializer(token)
-                return Response(serializer_resp.data)
+                Author.objects.get(id=user.id)
+                token.author_permission = True
+            except Author.DoesNotExist:
+                pass
+            token.token = uuid.uuid4()
+            token.save()
+            serializer_resp = TokenSerializer(token)
+            return Response(serializer_resp.data)
+
+        except serializers.ValidationError as e:
+            log.error(f"ValidationError: {e}")
+            return Response("bad json format", status=500)
+        except User.DoesNotExist:
+            log.error(f"User doesn't exist")
+            return Response("wrong username or password", status=500)
+        except Exception as e:
+            log.error(f"Something went wrong {e}")
+            return Response(status=404)
 
 
 class ProfileAPIView(APIView):
@@ -140,25 +166,25 @@ class ProfileAPIView(APIView):
     )
     def get(self, request):
         try:
+            log.info("Profile endpoint")
+            log.debug("Reading token from header")
             token_uuid = request.META.get("HTTP_TOKEN")
             token = Token.objects.get(token=token_uuid)
-            if is_token_valid(token):
-                user_info = User.objects.get(id=token.owner_id.id)
-                serializer = UserInfoSerializer(user_info)
-                return Response(serializer.data)
-            else:
-                return Response(status=404)
+            log.debug("Checking token")
+            is_token_valid(token)
+            log.debug("Getting user info")
+            user_info = User.objects.get(id=token.owner_id.id)
+            serializer = UserInfoSerializer(user_info)
+            return Response(serializer.data)
         except TokenExpired:
-            print("Token Expired")  # ЛОГИ
-            return Response(
-                status=404
-            )  # возможно стоит вернуть сообщение об истекшем токене
+            log.error("Token Expired")
+            return Response("Token Expired", status=403)
         except Token.DoesNotExist:
-            print("Token not exist")  # сделать нормальные логи
+            log.error("Token not exist")
             return Response(status=404)
         except User.DoesNotExist:
-            print("User not exist, but token exist")
+            log.error("User not exist, but token exist")
             return Response(status=404)
         except Exception as e:
-            print(f"Something wrong {e}")
+            log.error(f"Something wrong {e}")
             return Response(status=404)

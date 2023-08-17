@@ -6,9 +6,9 @@ POST  http://127.0.0.1:8000/api/users/  HTTP/1.1
 content-type: application/json
 
 {
-    "first_name": "first_name",
-    "last_name": "last_name",
-    "username": "username",
+    "first_name": "first_name1",
+    "last_name": "last_name1",
+    "username": "username1",
     "password": "password",
     "email": "email@email.com"
 }
@@ -35,8 +35,8 @@ POST  http://127.0.0.1:8000/api/login/  HTTP/1.1
 content-type: application/json
 
 {
-    "username": "username",
-    "password": "password"
+    "username": "admin",
+    "password": "admin"
 }
 
 ###

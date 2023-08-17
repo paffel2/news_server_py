@@ -29,6 +29,7 @@ token: 0db5a3ab-2a90-4cab-8cab-f388b1ac0d70
 
 PUT  http://127.0.0.1:8000/api/authors/  HTTP/1.1
 content-type: application/json
+token: 70f48e97-7cb2-40e1-a320-a06afae06585
 
 {
     "bio": "cringe",

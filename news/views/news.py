@@ -112,7 +112,7 @@ class NewsAPIView(mixins.ListModelMixin, generics.GenericAPIView):
     ]
 
     def get_queryset(self):
-        return News.objects.none()
+        return News.objects.filter(is_published=True)
 
     @swagger_auto_schema(
         operation_description="Publish news",

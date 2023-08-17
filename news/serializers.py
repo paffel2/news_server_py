@@ -21,6 +21,23 @@ token_param = openapi.Parameter(
 )
 
 
+def image_param(name, desc):
+    return openapi.Parameter(
+        name,
+        openapi.IN_FORM,
+        description=desc,
+        type=openapi.TYPE_FILE,
+    )
+
+
+def id_form_param(name, desc):
+    return openapi.Parameter(name, openapi.IN_FORM, type=openapi.TYPE_INTEGER)
+
+
+def text_form_param(name, desc):
+    return openapi.Parameter(name, openapi.IN_FORM, type=openapi.TYPE_STRING)
+
+
 class PutCategorySerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(max_length=250)
     parent_category = models.IntegerField()
@@ -80,7 +97,7 @@ class UserShortInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["username", "first_name", "last_name", "date_joined"]
+        fields = ["id", "username", "first_name", "last_name", "date_joined"]
 
 
 class UserInfoSerializer(UserShortInfoSerializer):

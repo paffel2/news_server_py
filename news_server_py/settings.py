@@ -90,7 +90,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -148,16 +147,17 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
 
-"""
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"console": {"format": "%(name)-12s %(levelname)-8s %(message)s"}},
+    "formatters": {
+        "console": {"format": "[%(asctime)s] [%(levelname)s] > %(message)s"}
+    },
     "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "console"}},
     "loggers": {
         "": {"level": "DEBUG", "handlers": ["console"], "propagate": True},
-        "django.request": {"level": "DEBUG", "handlers": ["console"]},
-        "django.db.backends": {"level": "DEBUG", "handlers": ["console"]},
+        # "django.request": {"level": "DEBUG", "handlers": ["console"]},
+        # "django.db.backends": {"level": "DEBUG", "handlers": ["console"]},
     },
 }
-"""
