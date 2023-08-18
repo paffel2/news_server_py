@@ -6,6 +6,7 @@ from news_server_py.settings import (
     ALLOWED_HOSTS,
     ALLOWED_PORT,
 )
+from .exceptions import *
 
 id_body = openapi.Schema("id", type=openapi.TYPE_INTEGER)
 
@@ -31,11 +32,20 @@ def image_param(name, desc):
 
 
 def id_form_param(name, desc):
-    return openapi.Parameter(name, openapi.IN_FORM, type=openapi.TYPE_INTEGER)
+    return openapi.Parameter(
+        name, openapi.IN_FORM, type=openapi.TYPE_INTEGER, description=desc
+    )
 
 
-def text_form_param(name, desc):
+def text_form_param(name):
     return openapi.Parameter(name, openapi.IN_FORM, type=openapi.TYPE_STRING)
+
+
+TYPE_IMAGE = "image"  #:
+
+
+def image_form_param(name, desc):
+    return openapi.Parameter(name, openapi.IN_FORM, type=TYPE_IMAGE, description=desc)
 
 
 class PutCategorySerializer(serializers.ModelSerializer):
@@ -197,7 +207,7 @@ class FullCategoryInfoSerializer(serializers.ModelSerializer):
         return super(FullCategoryInfoSerializer, self).to_representation(instance)
 
 
-class ImageIdToUrl(serializers.EmailField):
+class ImageIdToUrl(serializers.URLField):
     def to_representation(self, data):
         data = to_image_urls(data)
         return data
@@ -213,10 +223,9 @@ class ImageToUrlSerializer(serializers.ModelSerializer):
 
 def to_image_urls(id):
     if ALLOWED_HOSTS != []:
-        str = f"http://{ALLOWED_HOSTS[0]}:{ALLOWED_PORT}/api/images/{id}"
-        return str
+        return f"http://{ALLOWED_HOSTS[0]}:{ALLOWED_PORT}/api/images/{id}"
     else:
-        return "error"  # добавить обработку исключений
+        raise HostNotAllowed
 
 
 class NewsSerializer(serializers.ModelSerializer):

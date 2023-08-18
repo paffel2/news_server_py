@@ -1,6 +1,6 @@
 from django.core.serializers.json import Serializer
 from .models import *
-from news_server_py.settings import ALLOWED_HOSTS, ALLOWED_PORT, TOKEN_LIFE_TIME
+from news_server_py.settings import TOKEN_LIFE_TIME
 import datetime
 import time
 from .exceptions import *
@@ -27,20 +27,10 @@ def is_author(token_uuid):
         return False
 
 
-def to_image_urls(id):
-    if ALLOWED_HOSTS != []:
-        str = f"http://{ALLOWED_HOSTS[0]}:{ALLOWED_PORT}/api/images/{id}"
-        return str
-    else:
-        return "error"  # добавить обработку исключений
-
-
 def is_token_valid(token):
     now = time.mktime(datetime.datetime.now().timetuple())
     creation_time = time.mktime(token.creation_time.timetuple())
-    delta = (
-        now - creation_time
-    )  # разобраться с разницей во времени в базе данных и на сервере
+    delta = now - creation_time
     if delta < TOKEN_LIFE_TIME:
         return True
     else:
@@ -69,7 +59,7 @@ class PaginationClass(PageNumberPagination):
 
 def from_str_to_list_of_ints(string):
     if len(string) < 3:
-        raise Exception()
+        raise ToShortString
     else:
         string_without_brackets = string[1:-1]
         list_of_ints = [int(x) for x in string_without_brackets.split(",")]

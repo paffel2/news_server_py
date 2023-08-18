@@ -1,20 +1,25 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..shared import *
-from ..serializers import NewsSerializer, id_param, token_param, id_form_param
+from ..serializers import (
+    NewsSerializer,
+    id_param,
+    token_param,
+    id_form_param,
+    text_form_param,
+    image_form_param,
+)
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
 from drf_yasg.utils import swagger_auto_schema
 import logging as log
+from rest_framework.parsers import MultiPartParser
 
 
 class DraftsAPIView(generics.GenericAPIView):
     pagination_class = PaginationClass
 
-    serializer_class = NewsSerializer
-
-    def get_queryset(self):
-        return News.objects.none()
+    parser_classes = [MultiPartParser]
 
     @swagger_auto_schema(
         operation_description="Get list of drafts",
@@ -55,10 +60,17 @@ class DraftsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Add draft",
-        # @request_body=NewsForm,
         responses={201: "draft_id: integer", "other": "something went wrong"},
-        manual_parameters=[token_param],  # , id_form_param("category_id", None)],
-    )  # узнать как добавить в сваггер пример формы, разобраться почему в свагере есть тело запроса
+        manual_parameters=[
+            token_param,
+            id_form_param("category_id", None),
+            id_form_param("tags", "list of tags id in format [1,2,3]"),
+            text_form_param("text"),
+            text_form_param("title"),
+            image_form_param("main_image", "one image file"),
+            image_form_param("images", "one or more image file"),
+        ],
+    )
     def post(self, request):
         try:
             log.info("Creating draft")
@@ -177,9 +189,17 @@ class DraftsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Update draft",
-        # request_body=None,
         responses={201: "draft_id: integer", "other": "something went wrong"},
-    )  # узнать как добавить в сваггер пример формы
+        manual_parameters=[
+            token_param,
+            id_form_param("category_id", None),
+            id_form_param("tags", "list of tags id in format [1,2,3]"),
+            text_form_param("text"),
+            text_form_param("title"),
+            image_form_param("main_image", "one image file"),
+            image_form_param("images", "one or more image file"),
+        ],
+    )
     def put(self, request):
         try:
             log.info("Creating draft")
