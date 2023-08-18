@@ -28,9 +28,3 @@ token: 9772a0c6-29d6-4903-a392-82a50074df7f
 GET  http://127.0.0.1:8000/api/news/1  HTTP/1.1
 
 ###
-
-# get news 
-
-GET  http://127.0.0.1:8000/api/list_of_news/ HTTP/1.1
-
-###
