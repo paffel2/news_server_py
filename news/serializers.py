@@ -210,4 +210,4 @@ class CommentarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Commentary
-        fields = ["author", "created", "text"]
+        fields = ["id", "author", "created", "text"]

@@ -14,7 +14,7 @@ token_param = openapi.Parameter(
 )
 
 
-def image_param(name, desc):
+def image_param(name, desc=None):
     return openapi.Parameter(
         name,
         openapi.IN_FORM,
@@ -23,14 +23,16 @@ def image_param(name, desc):
     )
 
 
-def id_form_param(name, desc):
+def id_form_param(name, desc=None):
     return openapi.Parameter(
         name, openapi.IN_FORM, type=openapi.TYPE_INTEGER, description=desc
     )
 
 
-def text_form_param(name):
-    return openapi.Parameter(name, openapi.IN_FORM, type=openapi.TYPE_STRING)
+def text_form_param(name, desc=None):
+    return openapi.Parameter(
+        name, openapi.IN_FORM, type=openapi.TYPE_STRING, description=desc
+    )
 
 
 def image_form_param(name, desc):

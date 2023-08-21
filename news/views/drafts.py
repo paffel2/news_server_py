@@ -63,8 +63,8 @@ class DraftsAPIView(generics.GenericAPIView):
         responses={201: "draft_id: integer", "other": "something went wrong"},
         manual_parameters=[
             token_param,
-            id_form_param("category_id", None),
-            id_form_param("tags", "list of tags id in format [1,2,3]"),
+            id_form_param("category", None),
+            text_form_param("tags", "list of tags id in format [1,2,3]"),
             text_form_param("text"),
             text_form_param("title"),
             image_form_param("main_image", "one image file"),
@@ -100,9 +100,11 @@ class DraftsAPIView(generics.GenericAPIView):
                     log.debug("Getting other images")
                     images = request.FILES.getlist("images")
                     log.debug("Adding main image")
-                    to_db_main_image = Image()
-                    to_db_main_image.image.save(main_image.name, main_image)
-                    news.main_image = to_db_main_image
+                    if main_image:
+                        print(main_image)
+                        to_db_main_image = Image()
+                        to_db_main_image.image.save(main_image.name, main_image)
+                        news.main_image = to_db_main_image
                     log.debug("Saving news")
                     news.save()
                     images_list = []
@@ -146,7 +148,7 @@ class DraftsAPIView(generics.GenericAPIView):
     @swagger_auto_schema(
         operation_description="Delete draft",
         responses={200: "successful", "other": "something went wrong"},
-        manual_parameters=[id_param("draft id")],
+        manual_parameters=[id_param("draft id"), token_param],
     )
     def delete(self, request):
         try:
@@ -164,7 +166,8 @@ class DraftsAPIView(generics.GenericAPIView):
                     for image in draft.images.all():
                         image.delete()
                     log.debug("Deleting main image")
-                    draft.main_image.delete()
+                    if draft.main_image:
+                        draft.main_image.delete()
                     log.debug("Deleting draft")
                     draft.delete()
                     return Response(status=200)
@@ -192,7 +195,8 @@ class DraftsAPIView(generics.GenericAPIView):
         responses={201: "draft_id: integer", "other": "something went wrong"},
         manual_parameters=[
             token_param,
-            id_form_param("category_id", None),
+            id_form_param("id", "draft id"),
+            id_form_param("category", "category id"),
             id_form_param("tags", "list of tags id in format [1,2,3]"),
             text_form_param("text"),
             text_form_param("title"),
@@ -223,17 +227,21 @@ class DraftsAPIView(generics.GenericAPIView):
                     log.debug("Updating text")
                     news.text = form.cleaned_data.get("text")
                     log.debug("Deleting old images")
+                    news.tags.clear()
                     for image in news.images.all():
                         image.delete()
-                    news.main_image.delete()
+                    if news.main_image:
+                        news.main_image.delete()
                     log.debug("Getting main image")
                     main_image = request.FILES.get("main_image")
                     log.debug("Getting other images")
                     images = request.FILES.getlist("images")
                     log.debug("Adding main image")
-                    to_db_main_image = Image()
-                    to_db_main_image.image.save(main_image.name, main_image)
-                    news.main_image = to_db_main_image
+                    if main_image:
+                        print(main_image)
+                        to_db_main_image = Image()
+                        to_db_main_image.image.save(main_image.name, main_image)
+                        news.main_image = to_db_main_image
                     log.debug("Saving draft")
                     news.save()
                     images_list = []
@@ -279,6 +287,9 @@ class DraftsAPIView(generics.GenericAPIView):
 
 
 class FullDraftAPIView(APIView):
+    @swagger_auto_schema(
+        operation_description="Get draft by id", manual_parameters=[token_param]
+    )
     def get(self, request, draft_id):
         try:
             log.info("Getting draft by id")

@@ -180,7 +180,8 @@ class NewsAPIView(generics.ListAPIView):
                     log.debug("Deleting images")
                     for image in news.images.all():
                         image.delete()
-                    news.main_image.delete()
+                    if news.main_image:
+                        news.main_image.delete()
                     log.debug("Deleting news")
                     news.delete()
                     return Response(status=200)

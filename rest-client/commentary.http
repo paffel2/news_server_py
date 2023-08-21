@@ -10,8 +10,7 @@ token: 847d0f97-4d16-4abb-b389-161080805386
 ###
 
 # get commentaries
-GET  http://127.0.0.1:8000/api/news/13/commentaries/
-#token: 9772a0c6-29d6-4903-a392-82a50074df7f
+GET  http://127.0.0.1:8000/api/news/1/commentaries/
 
 ###
 
