@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..shared import *
+from ..common import *
 from ..serializers import (
     NewsSerializer,
     id_param,

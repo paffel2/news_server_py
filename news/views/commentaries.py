@@ -1,4 +1,4 @@
-from ..shared import *
+from ..common import *
 from rest_framework.response import Response
 from ..serializers import *
 from ..models import *

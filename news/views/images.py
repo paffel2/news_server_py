@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from ..shared import *
+from ..common import *
 from django.http import FileResponse
 from drf_yasg.utils import swagger_auto_schema
 import logging as log

@@ -2,7 +2,7 @@ from ..models import User, Token, Author
 import django.contrib.auth.hashers as hash
 from django.db.utils import IntegrityError
 import uuid
-from ..shared import *
+from ..common import *
 from news_server_py.settings import SALT
 from rest_framework.response import Response
 from rest_framework.views import APIView

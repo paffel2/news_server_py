@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, filters
-from ..shared import *
+from ..common import *
 from ..serializers import NewsSerializer, id_param, token_param
 from django_filters.rest_framework import DjangoFilterBackend
 from datetime import datetime
