@@ -1,6 +1,3 @@
-from email import message
-
-
 class TokenExpired(Exception):
     message = "Token expired"
 

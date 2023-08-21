@@ -1,51 +1,12 @@
 from .models import *
 from rest_framework import serializers
 from django.db import models
-from drf_yasg import openapi
+
 from news_server_py.settings import (
     ALLOWED_HOSTS,
     ALLOWED_PORT,
 )
 from .exceptions import *
-
-id_body = openapi.Schema("id", type=openapi.TYPE_INTEGER)
-
-
-def id_param(description):
-    return openapi.Parameter(
-        "id", openapi.IN_QUERY, description=description, type=openapi.TYPE_INTEGER
-    )
-
-
-token_param = openapi.Parameter(
-    "token", openapi.IN_HEADER, description="accessing token", type=openapi.TYPE_STRING
-)
-
-
-def image_param(name, desc):
-    return openapi.Parameter(
-        name,
-        openapi.IN_FORM,
-        description=desc,
-        type=openapi.TYPE_FILE,
-    )
-
-
-def id_form_param(name, desc):
-    return openapi.Parameter(
-        name, openapi.IN_FORM, type=openapi.TYPE_INTEGER, description=desc
-    )
-
-
-def text_form_param(name):
-    return openapi.Parameter(name, openapi.IN_FORM, type=openapi.TYPE_STRING)
-
-
-TYPE_IMAGE = "image"  #:
-
-
-def image_form_param(name, desc):
-    return openapi.Parameter(name, openapi.IN_FORM, type=TYPE_IMAGE, description=desc)
 
 
 class PutCategorySerializer(serializers.ModelSerializer):
@@ -185,16 +146,6 @@ class AuthorInfo(serializers.ModelSerializer):
         representation["email"] = instance.id.email
         representation["date_joined"] = instance.id.date_joined
         return representation
-
-
-class ShortNewsSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-    title = serializers.CharField(max_length=250)
-    text = serializers.CharField(max_length=250)
-
-    class Meta:
-        model = News
-        fields = ["id", "title", "text"]
 
 
 class FullCategoryInfoSerializer(serializers.ModelSerializer):

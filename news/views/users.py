@@ -13,6 +13,7 @@ from ..exceptions import *
 from rest_framework.exceptions import NotFound
 from rest_framework import generics
 import logging as log
+from ..swagger import token_param, id_param
 
 
 class UsersAPIView(generics.GenericAPIView):

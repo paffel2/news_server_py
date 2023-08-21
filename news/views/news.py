@@ -2,11 +2,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, filters
 from ..common import *
-from ..serializers import NewsSerializer, id_param, token_param
+from ..serializers import NewsSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from datetime import datetime
 from drf_yasg.utils import swagger_auto_schema, no_body
 import logging as log
+from ..swagger import id_param, token_param
 
 
 class AuthorUsernameFilter(filters.BaseFilterBackend):

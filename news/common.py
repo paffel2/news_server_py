@@ -8,11 +8,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 
-class CustomSerializer(Serializer):
-    def get_dump_object(self, obj):
-        return {"id": obj.id, **self._current}
-
-
 def is_admin(token_uuid):
     token = Token.objects.get(token=token_uuid)
     return token.owner_id.is_staff and is_token_valid(token)

@@ -9,6 +9,7 @@ from rest_framework import serializers, generics
 from django.db.utils import IntegrityError
 from rest_framework.exceptions import NotFound
 import logging as log
+from ..swagger import token_param, id_param
 
 
 class TagsAPIView(generics.GenericAPIView):

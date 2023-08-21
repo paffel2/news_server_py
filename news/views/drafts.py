@@ -1,8 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..common import *
-from ..serializers import (
-    NewsSerializer,
+from ..serializers import NewsSerializer
+from ..swagger import (
     id_param,
     token_param,
     id_form_param,
