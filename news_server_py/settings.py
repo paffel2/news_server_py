@@ -136,9 +136,9 @@ AUTH_USER_MODEL = "news.User"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
-SALT = "123"
+SALT = os.getenv("SALT")
 
-TOKEN_LIFE_TIME = 86400
+TOKEN_LIFE_TIME = int(os.getenv("TOKEN_LIFETIME"))
 
 
 REST_FRAMEWORK = {
