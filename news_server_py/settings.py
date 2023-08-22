@@ -150,14 +150,13 @@ REST_FRAMEWORK = {
 
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,
+    "disable_existing_loggers": True,
     "formatters": {
         "console": {"format": "[%(asctime)s] [%(levelname)s] > %(message)s"}
     },
     "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "console"}},
     "loggers": {
         "": {"level": "DEBUG", "handlers": ["console"], "propagate": True},
-        # "django.request": {"level": "DEBUG", "handlers": ["console"]},
-        # "django.db.backends": {"level": "DEBUG", "handlers": ["console"]},
+        "django.server": {"level": "INFO", "handlers": ["console"]},
     },
 }

@@ -27,33 +27,72 @@ After running go the `http://localhost:8000/swagger/` to see endpoints and descr
 
 # Testing
 If you use `Visual Studio Code`, you can install [rest-client extension](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) for testing endpoints.
+Or you can use curls from curls folder.
 
 # Project structure
 
     news_server_py/
 
-    ├── docker-compose.yml
+    ├── curls - folder with curls scripts for testing api
+    │   ├── authors
+    │   │   ├── delete.sh
+    │   │   ├── get.sh
+    │   │   ├── post.sh
+    │   │   └── put.sh
+    │   ├── categories
+    │   │   ├── delete.sh
+    │   │   ├── get.sh
+    │   │   ├── post.sh
+    │   │   └── put.sh
+    │   ├── comments
+    │   │   ├── delete.sh
+    │   │   ├── get.sh
+    │   │   └── post.sh
+    │   ├── drafts
+    │   │   ├── delete.sh
+    │   │   ├── get_list.sh
+    │   │   ├── get.sh
+    │   │   ├── post.sh
+    │   │   └── put.sh
+    │   ├── images.sh
+    │   ├── news
+    │   │   ├── delete.sh
+    │   │   ├── get_list.sh
+    │   │   ├── get.sh
+    │   │   └── post.sh
+    │   ├── tags
+    │   │   ├── delete.sh
+    │   │   ├── get.sh
+    │   │   ├── post.sh
+    │   │   └── put.sh
+    │   └── users
+    │       ├── delete.sh
+    │       ├── get.sh
+    │       ├── login.sh
+    │       ├── post.sh
+    │       └── profile.sh
+    ├── docker-compose.yml - docker files
     ├── Dockerfile
-    ├── env_template
-    ├── fixtures
-    │   └── admin.json
-    ├── generate_hash.py
+    ├── env_template - example of .env file
+    ├── fixtures - fixtures applying in migrations
+    │   └── admin.json 
+    ├── generate_hash.py - small script for generating password hash
     ├── manage.py
-    ├── news
+    ├── news - main app
     │   ├── admin.py
     │   ├── apps.py
-    │   ├── common.py
-    │   ├── exceptions.py
+    │   ├── common.py - file with common functions 
+    │   ├── exceptions.py - file with exceptions
     │   ├── __init__.py
     │   ├── migrations
     │   │   ├── 0001_initial.py
-    │   │   └── __init__.py
+    │   │   ├── __init__.py
     │   ├── models.py
-    │   ├── serializers.py
-    │   ├── shared.py
+    │   ├── serializers.py - module with serializers
+    │   ├── swagger.py - module with functions for generating swagger documentation
     │   ├── tests.py
-    │   ├── urls.py
-    │   └── views
+    │   ├── urls.py 
+    │   └── views - folder contains modules with views
     │       ├── authors.py
     │       ├── categories.py
     │       ├── commentaries.py
@@ -69,8 +108,8 @@ If you use `Visual Studio Code`, you can install [rest-client extension](https:/
     │   ├── urls.py
     │   └── wsgi.py
     ├── README.md
-    ├── requirements.txt
-    └── rest-client
+    ├── requirements.txt - file contains a list of required libraries
+    └── rest-client - folder with http requests for rest-client
         ├── authors.http
         ├── categories.http
         ├── commentary.http
@@ -81,4 +120,5 @@ If you use `Visual Studio Code`, you can install [rest-client extension](https:/
         └── users.http
 
 
-
+# TO DO
+ write test (maybe)
