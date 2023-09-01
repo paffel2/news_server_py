@@ -1,4 +1,3 @@
-from django.core.serializers.json import Serializer
 from .models import *
 from news_server_py.settings import TOKEN_LIFE_TIME
 import datetime
@@ -8,12 +7,12 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 
-def is_admin(token_uuid):
+def is_admin(token_uuid: str) -> bool:
     token = Token.objects.get(token=token_uuid)
     return token.owner_id.is_staff and is_token_valid(token)
 
 
-def is_author(token_uuid):
+def is_author(token_uuid: str) -> bool:
     try:
         token = Token.objects.get(token=token_uuid)
         _ = Author.objects.get(id=token.owner_id)
@@ -22,7 +21,7 @@ def is_author(token_uuid):
         return False
 
 
-def is_token_valid(token):
+def is_token_valid(token: Token) -> bool:
     now = time.mktime(datetime.datetime.now().timetuple())
     creation_time = time.mktime(token.creation_time.timetuple())
     delta = now - creation_time
@@ -32,7 +31,7 @@ def is_token_valid(token):
         raise TokenExpired()
 
 
-def is_news_owner(token_uuid, news_id):
+def is_news_owner(token_uuid: str, news_id: int) -> bool:
     try:
         token = Token.objects.get(token=token_uuid)
         news = News.objects.get(id=news_id)
@@ -52,7 +51,7 @@ class PaginationClass(PageNumberPagination):
         return schema
 
 
-def from_str_to_list_of_ints(string):
+def from_str_to_list_of_ints(string: str) -> list[int]:
     if len(string) < 3:
         raise ToShortString
     else:
