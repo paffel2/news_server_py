@@ -15,7 +15,7 @@ urlpatterns = [
     path("login/", LoginAPIView.as_view()),
     path("profile/", ProfileAPIView.as_view()),
     path("authors/", AuthorsAPIView.as_view()),
-    path("images/<int:image_id>/", GetImageAPIView.as_view()),
+    path("images/<int:image_id>/", GetImageAPIView.as_view(), name="image"),
     path("news/", NewsAPIView.as_view()),
     path("news/<int:news_id>/", FullNewsAPIView.as_view()),
     path("drafts/", DraftsAPIView.as_view()),

@@ -1,3 +1,4 @@
+from django.urls import reverse
 from .models import *
 from rest_framework import serializers
 from django.db import models
@@ -173,8 +174,9 @@ class ImageToUrlSerializer(serializers.ModelSerializer):
 
 
 def to_image_urls(id):
+    url = reverse("image", args=(id,))
     if ALLOWED_HOSTS != []:
-        return f"http://{ALLOWED_HOSTS[0]}:{ALLOWED_PORT}/api/images/{id}"
+        return f"http://{ALLOWED_HOSTS[0]}:{ALLOWED_PORT}{url}"
     else:
         raise HostNotAllowed
 
