@@ -22,19 +22,11 @@ You can use docker for running server.
 
     docker compose up
 
-When the server is first started, it is loaded with administrator information. The `fixtures.json` file contains all parameters. If you want to change the password, you need to generate a password hash. To do this, you need to use the `generate_gash.py` script. Without parameters, the script will generate a hash for the admin password.
-If you want to change the password and hash parameters, use the following parameters for generation.
+When the server is first started, it is loaded with administrator information. The `fixtures.json` file contains all parameters. If you want to change the admin, go to admin panel at http://localhost:8000/admin/. The default name and password is `admin`. 
 
-    -p, --password - password, string
-    -s, --salt - salt, integer
-    -i, --iterations - number of iterations, integer.
-
-Running the script
-    
-    python3 generate_hash.py --password 123
 
 # Endpoints
-After running go the `http://localhost:8000/swagger/` to see endpoints and descriptions.
+After running go the http://localhost:8000/swagger/ to see endpoints and descriptions.
 
 # Testing
 If you use `Visual Studio Code`, you can install [rest-client extension](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) for testing endpoints.
