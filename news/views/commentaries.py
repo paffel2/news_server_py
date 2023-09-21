@@ -8,6 +8,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework import serializers, generics
 from rest_framework.exceptions import NotFound
 import logging as log
+from ..permissions import CommentariesPermission
 
 
 class CommentsAPIView(generics.GenericAPIView):
@@ -16,6 +17,7 @@ class CommentsAPIView(generics.GenericAPIView):
     ordering_fields = ["created", "author__id__username"]
     ordering = ["created"]
     pagination_class = PaginationClass
+    permission_classes = [CommentariesPermission]
 
     @swagger_auto_schema(
         operation_description="Add comment to news",
@@ -30,33 +32,25 @@ class CommentsAPIView(generics.GenericAPIView):
             token_uuid = request.META.get("HTTP_TOKEN")
             log.debug("Getting Token from database")
             token = Token.objects.get(token=token_uuid)
-            log.debug("Checking token")
-            if is_token_valid(token):
-                log.debug("Parsing request body")
-                data = JSONParser().parse(request)
-                log.debug("Adding user info")
-                data["author"] = token.owner_id.id
-                log.debug("Adding news info")
-                data["news_id"] = news_id
-                log.debug("Serializing")
-                serializer = PostCommentarySerializer(data=data)
-                log.debug("Validation")
-                serializer.is_valid(raise_exception=True)
-                log.debug("Saving")
-                serializer.save()
-                return Response(status=201)
+            log.debug("Parsing request body")
+            data = JSONParser().parse(request)
+            log.debug("Adding user info")
+            data["author"] = token.owner_id.id
+            log.debug("Adding news info")
+            data["news_id"] = news_id
+            log.debug("Serializing")
+            serializer = PostCommentarySerializer(data=data)
+            log.debug("Validation")
+            serializer.is_valid(raise_exception=True)
+            log.debug("Saving")
+            serializer.save()
+            return Response(status=201)
         except serializers.ValidationError as e:
             if "news_id" in e.get_codes():
                 log.error("News doesn't exist")
                 return Response("News doesn't exist", status=500)
             log.error(f"Validation error: {e}")
             return Response(status=500)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
         except Exception as e:
             log.error(f"Something went wrong {e}")
             return Response(status=404)
@@ -95,25 +89,19 @@ class CommentsAPIView(generics.GenericAPIView):
     def delete(self, request, news_id):
         try:
             log.info("Deleting commentary")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Getting comment id from params")
-                commentary_id = request.GET.get("id")
-                log.debug("Getting comment")
-                commentary = Commentary.objects.get(
-                    id=commentary_id, news_id=news_id
-                )  # по идее фильтрация по новости не нужна, так как id комментария уникально
-                log.debug("Deleting")
-                commentary.delete()
-                return Response(status=200)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
+            log.debug("Getting comment id from params")
+            commentary_id = request.GET.get("id")
+            log.debug("Getting comment")
+            commentary = Commentary.objects.get(
+                id=commentary_id, news_id=news_id
+            )  # по идее фильтрация по новости не нужна, так как id комментария уникально
+            self.check_object_permissions(request, commentary)
+            log.debug("Deleting")
+            commentary.delete()
+            return Response(status=200)
+
+        except NotFoundException as e:
+            return Response(e.detail, status=404)
         except Commentary.DoesNotExist:
             log.error("Commentary not exist")
             return Response("Commentary not exist", status=500)

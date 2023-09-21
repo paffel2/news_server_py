@@ -8,6 +8,7 @@ from datetime import datetime
 from drf_yasg.utils import swagger_auto_schema, no_body
 import logging as log
 from ..swagger import id_param, token_param
+from ..permissions import NewsPermission
 
 
 class AuthorUsernameFilter(filters.BaseFilterBackend):
@@ -88,6 +89,7 @@ class NewsAPIView(generics.ListAPIView):
     ordering_fields = ["created", "author__id__username", "category__category_name"]
     ordering = ["created"]
     pagination_class = PaginationClass
+    permission_classes = [NewsPermission]
     filter_backends = [
         DjangoFilterBackend,
         filters.OrderingFilter,
@@ -121,32 +123,21 @@ class NewsAPIView(generics.ListAPIView):
     def post(self, request):
         try:
             log.info("Publish news")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Getting draft id from query params")
             news_id = request.GET.get("id")
-            log.debug("Checking draft")
-            if is_news_owner(token_uuid, news_id):
-                log.debug("Getting draft from database")
-                news = News.objects.get(id=news_id)
-                log.debug("Checking news status")
-                if news.is_published:
-                    log.error("News already published")
-                    return Response("News already published", status=403)
-                else:
-                    log.debug("Publishing")
-                    news.is_published = True
-                    news.save()
-                    return Response(f"news_id: {news.id}", status=201)
+            log.debug("Getting draft from database")
+            news = News.objects.get(id=news_id)
+            self.check_object_permissions(request, news)
+            log.debug("Checking news status")
+            if news.is_published:
+                log.error("News already published")
+                return Response("News already published", status=403)
             else:
-                log.error("Not author")
-                return Response(status=404)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
+                log.debug("Publishing")
+                news.is_published = True
+                news.save()
+                return Response(f"news_id: {news.id}", status=201)
+        except NotFoundException as e:
+            return Response(e.detail, status=404)
         except News.DoesNotExist:
             log.error("News doesn't exist")
             return Response(status=404)
@@ -191,12 +182,8 @@ class NewsAPIView(generics.ListAPIView):
             else:
                 log.error("No access")
                 return Response(status=404)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
+        except NotFoundException as e:
+            return Response(e.detail, status=404)
         except News.DoesNotExist:
             log.error("News doesn't exist")
             return Response(status=500)
