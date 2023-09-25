@@ -138,7 +138,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 SALT = os.getenv("SALT")
 
-TOKEN_LIFE_TIME = int(os.getenv("TOKEN_LIFETIME"))
+TOKEN_LIFE_TIME = int(os.getenv("TOKEN_LIFETIME", "86400"))
 
 
 REST_FRAMEWORK = {

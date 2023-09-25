@@ -38,23 +38,8 @@ class CategorySerializer(PutCategorySerializer):
         fields = ["id", "category_name", "parent_category"]
 
 
-class PutTagSerializer(serializers.ModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
     tag_name = serializers.CharField(max_length=250)
-
-    class Meta:
-        model = Tag
-        fields = ["tag_name"]
-
-
-class TagSerializer(PutTagSerializer):
-    id = serializers.IntegerField()
-    tag_name = serializers.CharField(max_length=250)
-
-    def update(self, instance, validated_data):
-        instance.tag_name = validated_data.get("tag_name", instance.tag_name)
-        instance.id = validated_data.get("id", instance.id)
-        instance.save()
-        return instance
 
     class Meta:
         model = Tag

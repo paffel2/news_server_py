@@ -21,7 +21,6 @@ class Category(models.Model):
 
 
 class Tag(models.Model):
-    id = models.AutoField(primary_key=True)
     tag_name = models.CharField(max_length=250, unique=True)
 
     class Meta:
