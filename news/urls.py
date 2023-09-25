@@ -1,5 +1,5 @@
 from django.urls import path
-from .views.categories import CategoryAPIView
+from .views.categories import CategoryViewSet
 from .views.tags import TagsViewSet
 from .views.users import UsersAPIView, LoginAPIView, ProfileAPIView
 from .views.authors import AuthorsAPIView
@@ -12,10 +12,10 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r"tags", TagsViewSet, "tags")
+router.register(r"categories", CategoryViewSet, "categories")
 
 
 urlpatterns = [
-    path("categories/", CategoryAPIView.as_view()),
     path("users/", UsersAPIView.as_view()),
     path("login/", LoginAPIView.as_view()),
     path("profile/", ProfileAPIView.as_view()),

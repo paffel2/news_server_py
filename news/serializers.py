@@ -10,28 +10,9 @@ from news_server_py.settings import (
 from .exceptions import *
 
 
-class PutCategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(max_length=250)
     parent_category = models.IntegerField()
-
-    class Meta:
-        model = Category
-        fields = ["category_name", "parent_category"]
-
-
-class CategorySerializer(PutCategorySerializer):
-    id = serializers.IntegerField()
-
-    def update(self, instance, validated_data):
-        instance.category_name = validated_data.get(
-            "category_name", instance.category_name
-        )
-        instance.id = validated_data.get("id", instance.id)
-        instance.parent_category = validated_data.get(
-            "parent_category", instance.parent_category
-        )
-        instance.save()
-        return instance
 
     class Meta:
         model = Category

@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-from ..serializers import CategorySerializer, PutCategorySerializer
+from ..serializers import CategorySerializer
 from ..swagger import id_param, token_param
 from ..common import *
 from drf_yasg.utils import swagger_auto_schema
@@ -9,30 +9,22 @@ from django.db.utils import IntegrityError
 from rest_framework.exceptions import NotFound
 import logging as log
 from ..permissions import ReadOnlyPermission
+from .viewset import CRUDViewSet
 
 
-class CategoryAPIView(generics.GenericAPIView):
-    pagination_class = PaginationClass
+class CategoryViewSet(CRUDViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
     permission_classes = [ReadOnlyPermission]
-
-    def get_queryset(self):
-        return Category.objects.all()
+    pagination_class = PaginationClass
 
     @swagger_auto_schema(
         operation_description="Get list of categories",
-        responses={200: CategorySerializer, "other": "something went wrong"},
+        responses={200: "successful", "other": "something went wrong"},
     )
-    def get(self, _):
+    def list(self, request, *args, **kwargs):  # перенести в crud класс
         try:
-            log.info("Getting list of categories endpoint")
-            log.debug("Getting list of categories from database")
-            categories = Category.objects.all()
-            log.debug("Serializing")
-            serializer = CategorySerializer(categories, many=True)
-            log.debug("Applying pagination")
-            page = self.paginate_queryset(serializer.data)
-            log.debug("Sending list of categories")
-            return Response(page, status=200)
+            return super().list(request, *args, **kwargs)
         except NotFound as e:
             log.error(f"NotFound error {e}")
             return Response(str(e), status=404)
@@ -42,30 +34,16 @@ class CategoryAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Create category",
-        responses={200: "category_id: integer", "other": "something went wrong"},
-        request_body=PutCategorySerializer,
+        responses={201: "category_id: integer", "other": "something went wrong"},
+        request_body=CategorySerializer,
         manual_parameters=[token_param],
     )
-    def post(self, request):
+    def create(self, request, *args, **kwargs):
         try:
-            log.info("Create category endpoint1")
-            log.debug("Body parsing")
-            data = JSONParser().parse(request)
-            log.debug("Serializing")
-            serializer_req = PutCategorySerializer(data=data)
-            log.debug("Validation")
-            serializer_req.is_valid(raise_exception=True)
-            log.debug("Saving")
-            obj = serializer_req.save()
-            id = obj.id
-            return Response(f"category_id: {id}", status=201)
-
+            return super().create(request, *args, **kwargs)
         except serializers.ValidationError as e:
             log.error(f"Validation error: {e}")
             return Response(status=500)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
         except IntegrityError as e:
             if "UNIQUE constraint failed" in e.args[0]:
                 log.error("Category already exists")
@@ -83,25 +61,12 @@ class CategoryAPIView(generics.GenericAPIView):
         request_body=CategorySerializer,
         manual_parameters=[token_param],
     )
-    def put(self, request):
+    def update(self, request, *args, **kwargs):
         try:
-            log.debug("Body parsing")
-            data = JSONParser().parse(request)
-            log.debug("Getting category from database")
-            instance = Category.objects.get(id=data["id"])
-            log.debug("Serializing")
-            serializer = CategorySerializer(data=data, instance=instance)
-            log.debug("Validation")
-            serializer.is_valid(raise_exception=True)
-            log.debug("Saving")
-            serializer.save()
-            return Response(status=201)
+            return super().update(request, *args, **kwargs)
         except serializers.ValidationError as e:
             log.error(f"Validation error: {e}")
             return Response(status=500)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
         except Category.DoesNotExist:
             log.error("Category doesn't exist")
             return Response("Category doesn't exist", status=500)
@@ -111,21 +76,12 @@ class CategoryAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Delete category",
-        responses={200: "successful", "other": "something went wrong"},
-        manual_parameters=[id_param("category id"), token_param],
+        responses={204: "successful", "other": "something went wrong"},
+        manual_parameters=[token_param],
     )
-    def delete(self, request):
+    def destroy(self, request, *args, **kwargs):
         try:
-            log.debug("Getting category id from query params")
-            category_id = request.GET.get("id")
-            log.debug("Getting category from database")
-            category = Category.objects.get(id=category_id)
-            log.debug("Deleting")
-            category.delete()
-            return Response(status=200)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
+            return super().destroy(request, *args, **kwargs)
         except Category.DoesNotExist:
             log.error("Category doesn't exist")
             return Response("Category doesn't exist", status=500)

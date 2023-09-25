@@ -7,7 +7,6 @@ from news_server_py.settings import MEDIA_ROOT
 
 
 class Category(models.Model):
-    id = models.AutoField(primary_key=True)
     category_name = models.CharField(max_length=250, unique=True)
     parent_category = models.ForeignKey(
         "self", on_delete=models.CASCADE, null=True, to_field="id"
