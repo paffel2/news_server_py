@@ -41,6 +41,9 @@ class Author(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     bio = models.TextField()
 
+    class Meta:
+        ordering = ["id"]
+
 
 class Token(models.Model):
     token = models.UUIDField()

@@ -2,10 +2,10 @@
 
 POST  http://127.0.0.1:8000/api/authors/  HTTP/1.1
 content-type: application/json
-token: 9772a0c6-29d6-4903-a392-82a50074df7f
+token: ee497287-a496-4a2b-8425-b40cd865ee10
 
 {
-    "id": 1,
+    "id": 2,
     "bio": "hello world1"
 }
 
@@ -19,21 +19,20 @@ GET  http://127.0.0.1:8000/api/authors/  HTTP/1.1
 
 #  delete author
 
-DELETE  http://127.0.0.1:8000/api/authors/?id=2  HTTP/1.1
+DELETE  http://127.0.0.1:8000/api/authors/2/  HTTP/1.1
 content-type: application/json
-token: 0db5a3ab-2a90-4cab-8cab-f388b1ac0d70
+token: ee497287-a496-4a2b-8425-b40cd865ee10
 
 ###
 
 #  update author
 
-PUT  http://127.0.0.1:8000/api/authors/  HTTP/1.1
+PUT  http://127.0.0.1:8000/api/authors/2/  HTTP/1.1
 content-type: application/json
-token: 70f48e97-7cb2-40e1-a320-a06afae06585
+token: ee497287-a496-4a2b-8425-b40cd865ee10
 
 {
-    "bio": "cringe",
-    "id": 1
+    "bio": "cringe"
 }
 
 ###

@@ -1,35 +1,35 @@
 from rest_framework.response import Response
 from ..serializers import PutAuthorSerializer, AuthorInfo
-from ..swagger import id_param, token_param
+from ..swagger import token_param
 from ..common import *
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.parsers import JSONParser
-from rest_framework import serializers, generics
+from rest_framework import serializers
 from django.db.utils import IntegrityError
 from rest_framework.exceptions import NotFound
 import logging as log
 from ..permissions import ReadOnlyPermission
+from .viewset import CRUDViewSet
 
 
-class AuthorsAPIView(generics.GenericAPIView):
-    pagination_class = PaginationClass
+class AuthorsViewSet(CRUDViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorInfo
     permission_classes = [ReadOnlyPermission]
+    pagination_class = PaginationClass
 
-    def get_queryset(self):
-        return Author.objects.all()
+    def get_serializer_class(self):
+        if self.action == "create":
+            return PutAuthorSerializer
+        else:
+            return self.serializer_class
 
     @swagger_auto_schema(
         operation_description="Get list of authors",
         responses={200: AuthorInfo, "other": "something went wrong"},
     )
-    def get(self, _):
+    def list(self, request, *args, **kwargs):
         try:
-            log.info("Get authors endpoint")
-            authors = Author.objects.all()
-            serializer = AuthorInfo(authors, many=True)
-            page = self.paginate_queryset(serializer.data)
-            log.info("List of authors sending")
-            return Response(page, status=200)
+            return super().list(request, *args, **kwargs)
         except NotFound as e:
             log.error(e)
             return Response(str(e), status=404)
@@ -43,21 +43,11 @@ class AuthorsAPIView(generics.GenericAPIView):
         request_body=PutAuthorSerializer,
         manual_parameters=[token_param],
     )
-    def post(self, request):
+    def create(self, request, *args, **kwargs):
         try:
-            log.info("Create author endpoint")
-            log.debug("Body parsing")
-            data = JSONParser().parse(request)
-            log.debug("Serializing")
-            serializer_req = PutAuthorSerializer(data=data)
-            log.debug("Validation of author info")
-            serializer_req.is_valid(raise_exception=True)
-            log.debug("Saving author")
-            serializer_req.save()
-            return Response(status=201)
-
+            return super().create(request, *args, **kwargs)
         except serializers.ValidationError as e:
-            log.error(e)
+            log.error(f"ValidationError: {e}")
             return Response(status=500)
         except IntegrityError as e:
             if "FOREIGN KEY constraint failed" in e.args[0]:
@@ -72,24 +62,12 @@ class AuthorsAPIView(generics.GenericAPIView):
     @swagger_auto_schema(
         operation_description="Update author",
         responses={200: "successful", "other": "something went wrong"},
-        request_body=PutAuthorSerializer,
+        request_body=AuthorInfo,
         manual_parameters=[token_param],
     )
-    def put(self, request):
+    def update(self, request, *args, **kwargs):
         try:
-            log.info("Update author endpoint")
-            log.debug("Body parsing")
-            data = JSONParser().parse(request)
-            log.debug("Getting author from database")
-            instance = Author.objects.get(id=data["id"])
-            log.debug("Serializing")
-            serializer = PutAuthorSerializer(data=data, instance=instance)
-            log.debug("Validation of author info")
-            serializer.is_valid(raise_exception=True)
-            log.debug("Saving author")
-            serializer.save()
-            return Response(status=201)
-
+            return super().update(request, *args, **kwargs)
         except serializers.ValidationError as e:
             log.error(f"ValidationError: {e}")
             return Response(status=500)
@@ -108,19 +86,12 @@ class AuthorsAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Delete author",
-        responses={200: "successful", "other": "something went wrong"},
-        manual_parameters=[id_param("author id"), token_param],
+        responses={204: "successful", "other": "something went wrong"},
+        manual_parameters=[token_param],
     )
-    def delete(self, request):
+    def destroy(self, request, *args, **kwargs):
         try:
-            log.info("Deleting author endpoint")
-            log.debug("Getting author id from parameters")
-            author_id = request.GET.get("id")
-            log.debug("Getting author from database")
-            author = Author.objects.get(id=author_id)
-            log.debug("Deleting author")
-            author.delete()
-            return Response(status=200)
+            return super().destroy(request, *args, **kwargs)
         except Author.DoesNotExist:
             log.error("User is not author")
             return Response("User is not author", status=500)
