@@ -11,35 +11,35 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import JSONParser
 from ..exceptions import *
 from rest_framework.exceptions import NotFound
-from rest_framework import generics
+from rest_framework import generics, mixins
 import logging as log
 from ..swagger import token_param, id_param
 from ..permissions import GetAndPostPermission
+from .viewset import CRUDViewSet
 
 
-class UsersAPIView(generics.GenericAPIView):
+class UsersViewSet(CRUDViewSet, mixins.RetrieveModelMixin):
+    http_method_names = ["get", "post", "delete"]
     pagination_class = PaginationClass
     permission_classes = [GetAndPostPermission]
+    queryset = User.objects.all()
+    serializer_class = UserShortInfoSerializer
 
-    def get_queryset(self):
-        return User.objects.all()
+    def get_serializer_class(self):
+        if self.action == "create":
+            return UserRegistrationSerializer
+        elif self.action == "retrieve":
+            return UserInfoSerializer
+        else:
+            return UserShortInfoSerializer
 
     @swagger_auto_schema(
         operation_description="Get list of users",
         responses={200: "successful", "other": "something went wrong"},
     )
-    def get(self, _):
+    def list(self, request, *args, **kwargs):
         try:
-            log.info("Getting list of users endpoint")
-            log.debug("Getting list of users from database")
-            users = User.objects.all()
-            log.debug("Serializing")
-            serializer = UserShortInfoSerializer(users, many=True)
-            log.debug("Applying pagination")
-            page = self.paginate_queryset(serializer.data)
-            log.debug("Sending list of users")
-            return Response(page, status=200)
-
+            return super().list(request, *args, **kwargs)
         except NotFound as e:
             log.error(f"NotFound error {e}")
             return Response(str(e), status=404)
@@ -49,23 +49,12 @@ class UsersAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Registration",
-        responses={200: "successful", "other": "something went wrong"},
+        responses={201: "successful", "other": "something went wrong"},
         request_body=UserRegistrationSerializer,
     )
-    def post(self, request):
+    def create(self, request, *args, **kwargs):
         try:
-            log.info("Registration endpoint")
-            log.debug("Getting request body")  # добавить аватар
-            data = JSONParser().parse(request)
-            log.debug("Serializing")
-            serializer_req = UserRegistrationSerializer(data=data)
-            log.debug("Validation")
-            serializer_req.is_valid(raise_exception=True)
-            log.debug("Saving user")
-            serializer_req.save(
-                password=hash.make_password(data["password"], salt=SALT)
-            )
-            return Response(status=201)
+            return super().create(request, *args, **kwargs)
         except serializers.ValidationError as e:
             log.error(f"ValidationError: {e}")
             return Response("bad json format", status=500)
@@ -85,22 +74,32 @@ class UsersAPIView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Deleting user",
-        responses={200: "successful", "other": "something went wrong"},
-        manual_parameters=[id_param("user_id"), token_param],
+        responses={204: "successful", "other": "something went wrong"},
+        manual_parameters=[token_param],
     )
-    def delete(self, request):
+    def destroy(self, request, *args, **kwargs):
         try:
-            log.info("Deleting user endpoint")
-            log.debug("Getting users's id from params")
-            user_id = request.GET.get("id")
-            log.debug("Getting users from database")
-            user = User.objects.get(id=user_id)
-            log.debug("Deleting user")
-            user.delete()
-            return Response(status=200)
+            return super().destroy(request, *args, **kwargs)
+        except User.DoesNotExist:
+            log.error("User doesn't exist")
+            return Response("Tag doesn't exist", status=500)
         except Exception as e:
             log.error(f"Something went wrong {e}")
-            return Response(e, status=404)
+            return Response(status=404)
+
+    @swagger_auto_schema(
+        operation_description="Get profile info",
+        responses={200: "successful", "other": "something went wrong"},
+    )
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            return super().retrieve(request, *args, **kwargs)
+        except User.DoesNotExist:
+            log.error("User not exist, but token exist")
+            return Response(status=404)
+        except Exception as e:
+            log.error(f"Something wrong {e}")
+            return Response(status=404)
 
 
 class LoginAPIView(APIView):
@@ -145,36 +144,4 @@ class LoginAPIView(APIView):
             return Response("wrong username or password", status=500)
         except Exception as e:
             log.error(f"Something went wrong {e}")
-            return Response(status=404)
-
-
-class ProfileAPIView(APIView):
-    @swagger_auto_schema(
-        operation_description="Get profile info",
-        responses={200: "successful", "other": "something went wrong"},
-        manual_parameters=[token_param],
-    )
-    def get(self, request):
-        try:
-            log.info("Profile endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            token = Token.objects.get(token=token_uuid)
-            log.debug("Checking token")
-            is_token_valid(token)
-            log.debug("Getting user info")
-            user_info = User.objects.get(id=token.owner_id.id)
-            serializer = UserInfoSerializer(user_info)
-            return Response(serializer.data)
-        except TokenExpired:
-            log.error("Token Expired")
-            return Response("Token Expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
-        except User.DoesNotExist:
-            log.error("User not exist, but token exist")
-            return Response(status=404)
-        except Exception as e:
-            log.error(f"Something wrong {e}")
             return Response(status=404)

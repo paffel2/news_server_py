@@ -30,8 +30,6 @@ class Tag(models.Model):
 
 
 class User(AbstractUser):
-    id = models.AutoField(primary_key=True)
-
     class Meta:
         ordering = ["first_name"]
 
