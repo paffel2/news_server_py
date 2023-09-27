@@ -24,14 +24,7 @@ class TagsViewSet(CRUDViewSet):
         responses={200: "successful", "other": "something went wrong"},
     )
     def list(self, request, *args, **kwargs):
-        try:
-            return super().list(request, *args, **kwargs)
-        except NotFound as e:
-            log.error(f"NotFound error {e}")
-            return Response(str(e), status=404)
-        except Exception as e:
-            log.error(f"Something went wrong {e}")
-            return Response(status=500)
+        return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
         operation_description="Create tag",
@@ -64,7 +57,6 @@ class TagsViewSet(CRUDViewSet):
     )
     def update(self, request, *args, **kwargs):
         try:
-            log.debug("ENDPOINT REACHED")
             return super().update(request, *args, **kwargs)
         except serializers.ValidationError as e:
             log.error(f"Validation error: {e}")

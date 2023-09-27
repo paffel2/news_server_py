@@ -38,14 +38,7 @@ class UsersViewSet(CRUDViewSet, mixins.RetrieveModelMixin):
         responses={200: "successful", "other": "something went wrong"},
     )
     def list(self, request, *args, **kwargs):
-        try:
-            return super().list(request, *args, **kwargs)
-        except NotFound as e:
-            log.error(f"NotFound error {e}")
-            return Response(str(e), status=404)
-        except Exception as e:
-            log.error(f"Something went wrong {e}")
-            return Response(status=404)
+        return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
         operation_description="Registration",
@@ -111,18 +104,12 @@ class LoginAPIView(APIView):
     def post(self, request):
         try:
             log.info("Login endpoint")
-            log.debug("Getting request body")
             data = JSONParser().parse(request)
-            log.debug("Serializing")
             serializer_req = UserLoginSerializer(data=data)
-            log.debug("Validation")
             serializer_req.is_valid(raise_exception=True)
-            log.debug("Getting username and password hash")
             password_l = hash.make_password(data["password"], salt=SALT)
             username_l = data["username"]
-            log.debug("Getting user")
             user = User.objects.get(username=username_l, password=password_l)
-            log.debug("Generating token")
             token = Token()
             token.owner_id = user
             token.admin_permission = user.is_staff

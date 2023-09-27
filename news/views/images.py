@@ -14,9 +14,7 @@ class GetImageAPIView(APIView):
     def get(self, _, image_id):
         try:
             log.info("Getting image endpoint")
-            log.debug("Get image from database")
             image = Image.objects.get(id=image_id)
-            log.debug("sending")
             return FileResponse(image.image)
         except Image.DoesNotExist:
             log.error("Image doesn't exist")

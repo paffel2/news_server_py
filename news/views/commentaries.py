@@ -28,21 +28,13 @@ class CommentsAPIView(generics.GenericAPIView):
     def post(self, request, news_id):
         try:
             log.info("Creating commentary")
-            log.debug("Reading token from header")
             token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Getting Token from database")
             token = Token.objects.get(token=token_uuid)
-            log.debug("Parsing request body")
             data = JSONParser().parse(request)
-            log.debug("Adding user info")
             data["author"] = token.owner_id.id
-            log.debug("Adding news info")
             data["news_id"] = news_id
-            log.debug("Serializing")
             serializer = PostCommentarySerializer(data=data)
-            log.debug("Validation")
             serializer.is_valid(raise_exception=True)
-            log.debug("Saving")
             serializer.save()
             return Response(status=201)
         except serializers.ValidationError as e:
@@ -62,13 +54,9 @@ class CommentsAPIView(generics.GenericAPIView):
     def get(self, _, news_id):
         try:
             log.info("Getting commentaries to news")
-            log.debug("Getting news by id")
             news = News.objects.get(id=news_id)
-            log.debug("Getting comments")
             commentaries = Commentary.objects.filter(news_id=news.id)
-            log.debug("Serializing")
             serializer = CommentarySerializer(commentaries, many=True)
-            log.debug("Applying pagination")
             page = self.paginate_queryset(serializer.data)
             return Response(page, status=200)
         except News.DoesNotExist:
@@ -89,14 +77,11 @@ class CommentsAPIView(generics.GenericAPIView):
     def delete(self, request, news_id):
         try:
             log.info("Deleting commentary")
-            log.debug("Getting comment id from params")
             commentary_id = request.GET.get("id")
-            log.debug("Getting comment")
             commentary = Commentary.objects.get(
                 id=commentary_id, news_id=news_id
             )  # по идее фильтрация по новости не нужна, так как id комментария уникально
             self.check_object_permissions(request, commentary)
-            log.debug("Deleting")
             commentary.delete()
             return Response(status=200)
 

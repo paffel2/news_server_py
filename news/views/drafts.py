@@ -31,13 +31,9 @@ class DraftsAPIView(generics.GenericAPIView):
             log.info("Get own drafts")
             token_uuid = request.META.get("HTTP_TOKEN")
             token = Token.objects.get(token=token_uuid)
-            log.debug("Getting author from database")
             author = Author.objects.get(id=token.owner_id)
-            log.debug("Getting drafts from database")
             drafts = News.objects.filter(is_published=False, author=author)
-            log.debug("Serializing")
             serializer = NewsSerializer(drafts, many=True)
-            log.debug("Applying pagination")
             page = self.paginate_queryset(serializer.data)
             return Response(page, status=200)
         except NotFound as e:
@@ -63,38 +59,25 @@ class DraftsAPIView(generics.GenericAPIView):
     def post(self, request):
         try:
             log.info("Creating draft")
-            log.debug("Parse form")
             form = NewsForm(request.POST, request.FILES)
-            log.debug("Form validation")
             if form.is_valid():
                 token_uuid = request.META.get("HTTP_TOKEN")
                 token = Token.objects.get(token=token_uuid)
-                log.debug("Creating news")
                 news = News()
-                log.debug("Adding category")
                 news.category = form.cleaned_data.get("category")
-                log.debug("Getting tags")
                 tags = form.cleaned_data.get("tags")
-                log.debug("Adding title")
                 news.title = form.cleaned_data.get("title")
-                log.debug("Adding text")
                 news.text = form.cleaned_data.get("text")
-                log.debug("Adding author")
                 news.author = Author.objects.get(id=token.owner_id)
-                log.debug("Getting main image")
                 main_image = request.FILES.get("main_image")
-                log.debug("Getting other images")
                 images = request.FILES.getlist("images")
-                log.debug("Adding main image")
                 if main_image:
                     print(main_image)
                     to_db_main_image = Image()
                     to_db_main_image.image.save(main_image.name, main_image)
                     news.main_image = to_db_main_image
-                log.debug("Saving news")
                 news.save()
                 images_list = []
-                log.debug("Adding other images and relations")
                 for image in images:
                     if "image" in image.content_type:
                         to_db_image = Image()
@@ -103,7 +86,6 @@ class DraftsAPIView(generics.GenericAPIView):
                     else:
                         log.error("BAD IMAGE")
                         return Response(status=500)
-                log.debug("Adding tags relations")
                 for tag in tags:
                     news.tags.add(tag)
                 for image in images_list:
@@ -130,20 +112,14 @@ class DraftsAPIView(generics.GenericAPIView):
     def delete(self, request):
         try:
             log.info("Deleting draft")
-            log.debug("Reading token from header")
-            log.debug("Getting draft id from query params")
             draft_id = request.GET.get("id")
             draft = News.objects.get(id=draft_id)
             self.check_object_permissions(request, draft)
-            log.debug("Checking draft")
             if not draft.is_published:
-                log.debug("Deleting images")
                 for image in draft.images.all():
                     image.delete()
-                log.debug("Deleting main image")
                 if draft.main_image:
                     draft.main_image.delete()
-                log.debug("Deleting draft")
                 draft.delete()
                 return Response(status=200)
             else:
@@ -176,44 +152,29 @@ class DraftsAPIView(generics.GenericAPIView):
     def put(self, request):
         try:
             log.info("Creating draft")
-            log.debug("Reading token from header")
-            log.debug("Parse form")
             form = DraftUpdateForm(request.POST, request.FILES)
             if form.is_valid():
-                log.debug("Getting draft_id from form")
                 draft_id = form.cleaned_data.get("id")
-                log.debug("Checking author")
-                log.debug("Getting draft from database")
                 news = News.objects.get(id=draft_id)
                 self.check_object_permissions(request, news)
-                log.debug("Updating category")
                 news.category = form.cleaned_data.get("category")
-                log.debug("Getting tags")
                 tags = form.cleaned_data.get("tags")
-                log.debug("Updating title")
                 news.title = form.cleaned_data.get("title")
-                log.debug("Updating text")
                 news.text = form.cleaned_data.get("text")
-                log.debug("Deleting old images")
                 news.tags.clear()
                 for image in news.images.all():
                     image.delete()
                 if news.main_image:
                     news.main_image.delete()
-                log.debug("Getting main image")
                 main_image = request.FILES.get("main_image")
-                log.debug("Getting other images")
                 images = request.FILES.getlist("images")
-                log.debug("Adding main image")
                 if main_image:
                     print(main_image)
                     to_db_main_image = Image()
                     to_db_main_image.image.save(main_image.name, main_image)
                     news.main_image = to_db_main_image
-                log.debug("Saving draft")
                 news.save()
                 images_list = []
-                log.debug("Adding other images and relations")
                 for image in images:
                     if "image" in image.content_type:
                         to_db_image = Image()
@@ -222,7 +183,6 @@ class DraftsAPIView(generics.GenericAPIView):
                     else:
                         log.error("Bad Image")
                         return Response("Bad Image", status=500)
-                log.debug("Adding tags relations")
                 for tag in tags:
                     news.tags.add(tag)
                 for image in images_list:

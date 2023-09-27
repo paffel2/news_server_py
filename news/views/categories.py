@@ -1,10 +1,9 @@
 from rest_framework.response import Response
 from ..serializers import CategorySerializer
-from ..swagger import id_param, token_param
+from ..swagger import token_param
 from ..common import *
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.parsers import JSONParser
-from rest_framework import serializers, generics
+from rest_framework import serializers
 from django.db.utils import IntegrityError
 from rest_framework.exceptions import NotFound
 import logging as log
@@ -22,15 +21,8 @@ class CategoryViewSet(CRUDViewSet):
         operation_description="Get list of categories",
         responses={200: "successful", "other": "something went wrong"},
     )
-    def list(self, request, *args, **kwargs):  # перенести в crud класс
-        try:
-            return super().list(request, *args, **kwargs)
-        except NotFound as e:
-            log.error(f"NotFound error {e}")
-            return Response(str(e), status=404)
-        except Exception as e:
-            log.error(f"Something went wrong {e}")
-            return Response(status=500)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
         operation_description="Create category",

@@ -28,14 +28,7 @@ class AuthorsViewSet(CRUDViewSet):
         responses={200: AuthorInfo, "other": "something went wrong"},
     )
     def list(self, request, *args, **kwargs):
-        try:
-            return super().list(request, *args, **kwargs)
-        except NotFound as e:
-            log.error(e)
-            return Response(str(e), status=404)
-        except Exception as e:
-            log.error(f"Something went wrong {e}")
-            return Response(status=500)
+        return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
         operation_description="Create author",
