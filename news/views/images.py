@@ -1,8 +1,10 @@
 from rest_framework.views import APIView
-from ..common import *
+
 from django.http import FileResponse
 from drf_yasg.utils import swagger_auto_schema
 import logging as log
+from ..models import Image
+from rest_framework.response import Response
 
 
 class GetImageAPIView(APIView):
