@@ -3,7 +3,8 @@ from django.db.models.deletion import Collector
 from django.contrib.auth.models import AbstractUser
 from django import forms
 import os
-from news_server_py.settings import MEDIA_ROOT
+from news_server_py.settings import MEDIA_ROOT, SALT
+import django.contrib.auth.hashers as hash
 
 
 class Category(models.Model):
@@ -35,6 +36,10 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.first_name + " " + self.last_name
+
+    def set_password(self, raw_password: str | None) -> None:
+        self.password = hash.make_password(raw_password, salt=SALT)
+        self._password = raw_password
 
 
 class Author(models.Model):

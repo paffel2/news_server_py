@@ -4,7 +4,7 @@ News server written via django and django rest-framework
 # Environment file
 In  env_template you find database parameters and token parameters
 
-Rename `env_template` to '.env' and change parameters. if you change the parameters in `.env` make sure that the `Dockerfile` and `docker-compose.yml` files are also changed
+Rename `env_template` to '.env' and change parameters. If you change ports in `.env` make sure that the `Dockerfile` and `docker-compose.yml` files are also changed.
 
 ##
 
@@ -22,8 +22,11 @@ You can use docker for running server.
 
     docker compose up
 
+When the server is first started, it is loaded with administrator information. The `fixtures.json` file contains all parameters. If you want to change the admin, go to admin panel at http://localhost:8000/admin/. The default name and password is `admin`. 
+
+
 # Endpoints
-After running go the `http://localhost:8000/swagger/` to see endpoints and descriptions.
+After running go the http://localhost:8000/swagger/ to see endpoints and descriptions.
 
 # Testing
 If you use `Visual Studio Code`, you can install [rest-client extension](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) for testing endpoints.
