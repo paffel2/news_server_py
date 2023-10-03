@@ -1,7 +1,6 @@
 [
 {
     "model": "news.user",
-    "pk": 1,
     "fields": {
         "password": "pbkdf2_sha256$600000$123$tOmj7HSCtwo3Z0x8oh3pPFuoZUkUVmb3csC5RCCX6b8=",
         "last_login": null,

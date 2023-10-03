@@ -9,6 +9,7 @@ from drf_yasg.utils import swagger_auto_schema, no_body
 import logging as log
 from ..swagger import id_param, token_param
 from ..permissions import NewsPermission
+from rest_framework.exceptions import NotFound
 
 
 class AuthorUsernameFilter(filters.BaseFilterBackend):
@@ -124,15 +125,12 @@ class NewsAPIView(generics.ListAPIView):
         try:
             log.info("Publish news")
             news_id = request.GET.get("id")
-            log.debug("Getting draft from database")
             news = News.objects.get(id=news_id)
             self.check_object_permissions(request, news)
-            log.debug("Checking news status")
             if news.is_published:
                 log.error("News already published")
                 return Response("News already published", status=403)
             else:
-                log.debug("Publishing")
                 news.is_published = True
                 news.save()
                 return Response(f"news_id: {news.id}", status=201)
@@ -149,7 +147,14 @@ class NewsAPIView(generics.ListAPIView):
         operation_description="Get list of news",
     )
     def get(self, request, *args, **kwargs):
-        return super().get(self, request, *args, **kwargs)
+        try:
+            return super().get(self, request, *args, **kwargs)
+        except NotFound as e:
+            log.error(f"NotFound error {e}")
+            return Response(str(e), status=404)
+        except Exception as e:
+            log.error(f"Something went wrong {e}")
+            return Response(status=500)
 
     @swagger_auto_schema(
         operation_description="Delete news",
@@ -159,21 +164,15 @@ class NewsAPIView(generics.ListAPIView):
     def delete(self, request):
         try:
             log.info("Deleting news")
-            log.debug("Reading token from header")
             token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Getting draft id from query params")
             news_id = request.GET.get("id")
-            log.debug("Checking author and news")
             if is_admin(token_uuid) or is_news_owner(token_uuid, news_id):
-                log.debug("Getting news from database")
                 news = News.objects.get(id=news_id)
                 if news.is_published:
-                    log.debug("Deleting images")
                     for image in news.images.all():
                         image.delete()
                     if news.main_image:
                         news.main_image.delete()
-                    log.debug("Deleting news")
                     news.delete()
                     return Response(status=200)
                 else:
@@ -199,11 +198,8 @@ class FullNewsAPIView(APIView):
     def get(self, _, news_id):
         try:
             log.info("Getting news by id")
-            log.debug("Getting news from database")
             news = News.objects.get(id=news_id)
-            log.debug("Serializing")
             serializer = NewsSerializer(news)
-            log.debug("Sending")
             return Response(serializer.data)
         except News.DoesNotExist:
             log.error("News doesn't exist")

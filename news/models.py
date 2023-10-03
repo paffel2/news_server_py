@@ -8,7 +8,6 @@ import django.contrib.auth.hashers as hash
 
 
 class Category(models.Model):
-    id = models.AutoField(primary_key=True)
     category_name = models.CharField(max_length=250, unique=True)
     parent_category = models.ForeignKey(
         "self", on_delete=models.CASCADE, null=True, to_field="id"
@@ -22,7 +21,6 @@ class Category(models.Model):
 
 
 class Tag(models.Model):
-    id = models.AutoField(primary_key=True)
     tag_name = models.CharField(max_length=250, unique=True)
 
     class Meta:
@@ -33,8 +31,6 @@ class Tag(models.Model):
 
 
 class User(AbstractUser):
-    id = models.AutoField(primary_key=True)
-
     class Meta:
         ordering = ["first_name"]
 
@@ -49,6 +45,9 @@ class User(AbstractUser):
 class Author(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     bio = models.TextField()
+
+    class Meta:
+        ordering = ["id"]
 
 
 class Token(models.Model):

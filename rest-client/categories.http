@@ -1,37 +1,35 @@
 #  add category
 POST  http://127.0.0.1:8000/api/categories/  HTTP/1.1
 content-type: application/json
-token: 9772a0c6-29d6-4903-a392-82a50074df7f
+token: 881e6787-506a-4957-a674-47e31b2b481e
 
 {
-    "category_name": "Football",
-    "parent_category": 1
+    "category_name": "Sport"
 }
 
 ###
 
 #  get categories
 
-GET  http://127.0.0.1:8000/api/categories/?page=9  HTTP/1.1
+GET  http://127.0.0.1:8000/api/categories/  HTTP/1.1
 
 ###
 
 #  update categories
 
-PUT  http://127.0.0.1:8000/api/categories/  HTTP/1.1
+PUT  http://127.0.0.1:8000/api/categories/1/  HTTP/1.1
 content-type: application/json
-token: 2d13ee53-d1a1-40fe-b1a3-5e2f36cad9e7
+token: 881e6787-506a-4957-a674-47e31b2b481e
 
 {
-    "category_name": "Baseball",
-    "id": 3
+    "category_name": "Sport"
 }
 
 ###
 
 #  delete categories
 
-DELETE  http://127.0.0.1:8000/api/categories/?id=4  HTTP/1.1
+DELETE  http://127.0.0.1:8000/api/categories/1/  HTTP/1.1
 content-type: application/json
-token: 2d13ee53-d1a1-40fe-b1a3-5e2f36cad9e7
+token: 881e6787-506a-4957-a674-47e31b2b481e
 ###
