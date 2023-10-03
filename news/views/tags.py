@@ -10,10 +10,12 @@ from django.db.utils import IntegrityError
 from rest_framework.exceptions import NotFound
 import logging as log
 from ..swagger import token_param, id_param
+from ..permissions import ReadOnlyPermission
 
 
 class TagsAPIView(generics.GenericAPIView):
     pagination_class = PaginationClass
+    permission_classes = [ReadOnlyPermission]
 
     def get_queryset(self):
         return Tag.objects.all()
@@ -49,33 +51,20 @@ class TagsAPIView(generics.GenericAPIView):
     def post(self, request):
         try:
             log.info("Create tag endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Body parsing")
-                data = JSONParser().parse(request)
-                log.debug("Serializing")
-                serializer_req = PutTagSerializer(data=data)
-                log.debug("Validation")
-                serializer_req.is_valid(raise_exception=True)
-                log.debug("Saving")
-                obj = serializer_req.save()
-                id = obj.id
-                return Response(f"tag_id: {id}", status=201)
-            else:
-                log.error("Not admin")
-                return Response(status=404)
+            log.debug("Body parsing")
+            data = JSONParser().parse(request)
+            log.debug("Serializing")
+            serializer_req = PutTagSerializer(data=data)
+            log.debug("Validation")
+            serializer_req.is_valid(raise_exception=True)
+            log.debug("Saving")
+            obj = serializer_req.save()
+            id = obj.id
+            return Response(f"tag_id: {id}", status=201)
 
         except serializers.ValidationError as e:
             log.error(f"Validation error: {e}")
             return Response(status=500)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
         except IntegrityError as e:
             if "UNIQUE constraint failed" in e.args[0]:
                 log.error("Tag already exists")
@@ -96,33 +85,20 @@ class TagsAPIView(generics.GenericAPIView):
     def put(self, request):
         try:
             log.info("Update tag endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Body parsing")
-                data = JSONParser().parse(request)
-                log.debug("Getting tag from database")
-                instance = Tag.objects.get(id=data["id"])
-                log.debug("Serializing")
-                serializer = TagSerializer(data=data, instance=instance)
-                log.debug("Validation")
-                serializer.is_valid(raise_exception=True)
-                log.debug("Saving")
-                serializer.save()
-                return Response(status=201)
-            else:
-                log.error("Not admin")
-                return Response(status=404)
+            log.debug("Body parsing")
+            data = JSONParser().parse(request)
+            log.debug("Getting tag from database")
+            instance = Tag.objects.get(id=data["id"])
+            log.debug("Serializing")
+            serializer = TagSerializer(data=data, instance=instance)
+            log.debug("Validation")
+            serializer.is_valid(raise_exception=True)
+            log.debug("Saving")
+            serializer.save()
+            return Response(status=201)
         except serializers.ValidationError as e:
             log.error(f"Validation error: {e}")
             return Response(status=500)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response(status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
         except Tag.DoesNotExist:
             log.error("Tag doesn't exist")
             return Response("Tag doesn't exist", status=500)
@@ -138,26 +114,13 @@ class TagsAPIView(generics.GenericAPIView):
     def delete(self, request):
         try:
             log.info("Delete tag endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Getting tag id from query params")
-                tag_id = request.GET.get("id")
-                log.debug("Getting category from database")
-                tag = Tag.objects.get(id=tag_id)
-                log.debug("Deleting")
-                tag.delete()
-                return Response(status=200)
-            else:
-                log.error("Not admin")
-                return Response(status=404)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
+            log.debug("Getting tag id from query params")
+            tag_id = request.GET.get("id")
+            log.debug("Getting category from database")
+            tag = Tag.objects.get(id=tag_id)
+            log.debug("Deleting")
+            tag.delete()
+            return Response(status=200)
         except Tag.DoesNotExist:
             log.error("Tag doesn't exist")
             return Response("Tag doesn't exist", status=500)

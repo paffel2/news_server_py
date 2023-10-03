@@ -8,10 +8,12 @@ from rest_framework import serializers, generics
 from django.db.utils import IntegrityError
 from rest_framework.exceptions import NotFound
 import logging as log
+from ..permissions import ReadOnlyPermission
 
 
 class CategoryAPIView(generics.GenericAPIView):
     pagination_class = PaginationClass
+    permission_classes = [ReadOnlyPermission]
 
     def get_queryset(self):
         return Category.objects.all()
@@ -46,24 +48,17 @@ class CategoryAPIView(generics.GenericAPIView):
     )
     def post(self, request):
         try:
-            log.info("Create category endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Body parsing")
-                data = JSONParser().parse(request)
-                log.debug("Serializing")
-                serializer_req = PutCategorySerializer(data=data)
-                log.debug("Validation")
-                serializer_req.is_valid(raise_exception=True)
-                log.debug("Saving")
-                obj = serializer_req.save()
-                id = obj.id
-                return Response(f"category_id: {id}", status=201)
-            else:
-                log.error("Not admin")
-                return Response(status=404)
+            log.info("Create category endpoint1")
+            log.debug("Body parsing")
+            data = JSONParser().parse(request)
+            log.debug("Serializing")
+            serializer_req = PutCategorySerializer(data=data)
+            log.debug("Validation")
+            serializer_req.is_valid(raise_exception=True)
+            log.debug("Saving")
+            obj = serializer_req.save()
+            id = obj.id
+            return Response(f"category_id: {id}", status=201)
 
         except serializers.ValidationError as e:
             log.error(f"Validation error: {e}")
@@ -71,9 +66,6 @@ class CategoryAPIView(generics.GenericAPIView):
         except TokenExpired:
             log.error("Token expired")
             return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
         except IntegrityError as e:
             if "UNIQUE constraint failed" in e.args[0]:
                 log.error("Category already exists")
@@ -93,34 +85,23 @@ class CategoryAPIView(generics.GenericAPIView):
     )
     def put(self, request):
         try:
-            log.info("Update category endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Body parsing")
-                data = JSONParser().parse(request)
-                log.debug("Getting category from database")
-                instance = Category.objects.get(id=data["id"])
-                log.debug("Serializing")
-                serializer = CategorySerializer(data=data, instance=instance)
-                log.debug("Validation")
-                serializer.is_valid(raise_exception=True)
-                log.debug("Saving")
-                serializer.save()
-                return Response(status=201)
-            else:
-                log.error("Not admin")
-                return Response(status=404)
+            log.debug("Body parsing")
+            data = JSONParser().parse(request)
+            log.debug("Getting category from database")
+            instance = Category.objects.get(id=data["id"])
+            log.debug("Serializing")
+            serializer = CategorySerializer(data=data, instance=instance)
+            log.debug("Validation")
+            serializer.is_valid(raise_exception=True)
+            log.debug("Saving")
+            serializer.save()
+            return Response(status=201)
         except serializers.ValidationError as e:
             log.error(f"Validation error: {e}")
             return Response(status=500)
         except TokenExpired:
             log.error("Token expired")
             return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
         except Category.DoesNotExist:
             log.error("Category doesn't exist")
             return Response("Category doesn't exist", status=500)
@@ -135,27 +116,16 @@ class CategoryAPIView(generics.GenericAPIView):
     )
     def delete(self, request):
         try:
-            log.info("Delete category endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Getting category id from query params")
-                category_id = request.GET.get("id")
-                log.debug("Getting category from database")
-                category = Category.objects.get(id=category_id)
-                log.debug("Deleting")
-                category.delete()
-                return Response(status=200)
-            else:
-                log.error("Not admin")
-                return Response(status=404)
+            log.debug("Getting category id from query params")
+            category_id = request.GET.get("id")
+            log.debug("Getting category from database")
+            category = Category.objects.get(id=category_id)
+            log.debug("Deleting")
+            category.delete()
+            return Response(status=200)
         except TokenExpired:
             log.error("Token expired")
             return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
         except Category.DoesNotExist:
             log.error("Category doesn't exist")
             return Response("Category doesn't exist", status=500)

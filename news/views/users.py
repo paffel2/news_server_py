@@ -14,10 +14,12 @@ from rest_framework.exceptions import NotFound
 from rest_framework import generics
 import logging as log
 from ..swagger import token_param, id_param
+from ..permissions import GetAndPostPermission
 
 
 class UsersAPIView(generics.GenericAPIView):
     pagination_class = PaginationClass
+    permission_classes = [GetAndPostPermission]
 
     def get_queryset(self):
         return User.objects.all()
@@ -89,26 +91,13 @@ class UsersAPIView(generics.GenericAPIView):
     def delete(self, request):
         try:
             log.info("Deleting user endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Getting users's id from params")
-                user_id = request.GET.get("id")
-                log.debug("Getting users from database")
-                user = User.objects.get(id=user_id)
-                log.debug("Deleting user")
-                user.delete()
-                return Response(status=200)
-            else:
-                log.error("Is not admin")
-                return Response(status=404)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
+            log.debug("Getting users's id from params")
+            user_id = request.GET.get("id")
+            log.debug("Getting users from database")
+            user = User.objects.get(id=user_id)
+            log.debug("Deleting user")
+            user.delete()
+            return Response(status=200)
         except Exception as e:
             log.error(f"Something went wrong {e}")
             return Response(e, status=404)

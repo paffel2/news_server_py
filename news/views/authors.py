@@ -8,10 +8,12 @@ from rest_framework import serializers, generics
 from django.db.utils import IntegrityError
 from rest_framework.exceptions import NotFound
 import logging as log
+from ..permissions import ReadOnlyPermission
 
 
 class AuthorsAPIView(generics.GenericAPIView):
     pagination_class = PaginationClass
+    permission_classes = [ReadOnlyPermission]
 
     def get_queryset(self):
         return Author.objects.all()
@@ -44,22 +46,16 @@ class AuthorsAPIView(generics.GenericAPIView):
     def post(self, request):
         try:
             log.info("Create author endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Body parsing")
-                data = JSONParser().parse(request)
-                log.debug("Serializing")
-                serializer_req = PutAuthorSerializer(data=data)
-                log.debug("Validation of author info")
-                serializer_req.is_valid(raise_exception=True)
-                log.debug("Saving author")
-                serializer_req.save()
-                return Response(status=201)
-            else:
-                log.error("Not admin")
-                return Response(status=404)
+            log.debug("Body parsing")
+            data = JSONParser().parse(request)
+            log.debug("Serializing")
+            serializer_req = PutAuthorSerializer(data=data)
+            log.debug("Validation of author info")
+            serializer_req.is_valid(raise_exception=True)
+            log.debug("Saving author")
+            serializer_req.save()
+            return Response(status=201)
+
         except serializers.ValidationError as e:
             log.error(e)
             return Response(status=500)
@@ -68,12 +64,6 @@ class AuthorsAPIView(generics.GenericAPIView):
                 log.error(e.args[0])
                 return Response("user not exists", status=500)
             log.error(e)
-            return Response(status=404)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
             return Response(status=404)
         except Exception as e:
             log.error(f"Something went wrong {e}")
@@ -88,24 +78,17 @@ class AuthorsAPIView(generics.GenericAPIView):
     def put(self, request):
         try:
             log.info("Update author endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Body parsing")
-                data = JSONParser().parse(request)
-                log.debug("Getting author from database")
-                instance = Author.objects.get(id=data["id"])
-                log.debug("Serializing")
-                serializer = PutAuthorSerializer(data=data, instance=instance)
-                log.debug("Validation of author info")
-                serializer.is_valid(raise_exception=True)
-                log.debug("Saving author")
-                serializer.save()
-                return Response(status=201)
-            else:
-                log.error("Not admin")
-                return Response(status=404)
+            log.debug("Body parsing")
+            data = JSONParser().parse(request)
+            log.debug("Getting author from database")
+            instance = Author.objects.get(id=data["id"])
+            log.debug("Serializing")
+            serializer = PutAuthorSerializer(data=data, instance=instance)
+            log.debug("Validation of author info")
+            serializer.is_valid(raise_exception=True)
+            log.debug("Saving author")
+            serializer.save()
+            return Response(status=201)
 
         except serializers.ValidationError as e:
             log.error(f"ValidationError: {e}")
@@ -116,12 +99,6 @@ class AuthorsAPIView(generics.GenericAPIView):
                 return Response("user not exists", status=403)
             log.error(f"IntegrityError {e}")
             return Response(status=500)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
         except Author.DoesNotExist:
             log.error("Author doesn't exist")
             return Response(status=500)
@@ -137,26 +114,13 @@ class AuthorsAPIView(generics.GenericAPIView):
     def delete(self, request):
         try:
             log.info("Deleting author endpoint")
-            log.debug("Reading token from header")
-            token_uuid = request.META.get("HTTP_TOKEN")
-            log.debug("Checking token")
-            if is_admin(token_uuid):
-                log.debug("Getting author id from parameters")
-                author_id = request.GET.get("id")
-                log.debug("Getting author from database")
-                author = Author.objects.get(id=author_id)
-                log.debug("Deleting author")
-                author.delete()
-                return Response(status=200)
-            else:
-                log.error("Not admin")
-                return Response(status=404)
-        except TokenExpired:
-            log.error("Token expired")
-            return Response("Token expired", status=403)
-        except Token.DoesNotExist:
-            log.error("Token not exist")
-            return Response(status=404)
+            log.debug("Getting author id from parameters")
+            author_id = request.GET.get("id")
+            log.debug("Getting author from database")
+            author = Author.objects.get(id=author_id)
+            log.debug("Deleting author")
+            author.delete()
+            return Response(status=200)
         except Author.DoesNotExist:
             log.error("User is not author")
             return Response("User is not author", status=500)
